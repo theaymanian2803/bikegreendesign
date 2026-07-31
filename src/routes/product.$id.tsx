@@ -168,7 +168,7 @@ function ProductDetail() {
             </p>
 
             <ul className="mt-5 space-y-2">
-              {product.highlights?.map((h) => (
+              {product.highlights?.map((h: string) => (
                 <li key={h} className="flex items-start gap-2 text-xs text-ink">
                   <Check className="mt-0.5 size-3.5 shrink-0 text-primary" />
                   {h}
@@ -269,7 +269,7 @@ function ProductDetail() {
             {tab === "details" ? (
               <table className="w-full max-w-[620px] text-xs">
                 <tbody>
-                  {product.specs?.map((s) => (
+                  {product.specs?.map((s: { label: string; value: string }) => (
                     <tr key={s.label} className="border-b border-border">
                       <th className="w-40 py-2.5 text-left font-medium text-ink">{s.label}</th>
                       <td className="py-2.5 text-muted-foreground">{s.value}</td>
