@@ -16,7 +16,46 @@ export type Product = {
   image: string;
   badge?: string;
   category: string;
+  brand?: string;
+  sku?: string;
+  description?: string;
+  highlights?: string[];
+  specs?: { label: string; value: string }[];
+  gallery?: string[];
 };
+
+export const galleryPool = [derailleur, wheel, crank, stem, suspension];
+
+export function getProduct(id: string) {
+  return products.find((p) => p.id === id);
+}
+
+export function productGallery(p: Product) {
+  return p.gallery ?? [p.image, ...galleryPool.filter((g) => g !== p.image).slice(0, 3)];
+}
+
+export function relatedProducts(p: Product) {
+  return products.filter((x) => x.id !== p.id && x.category === p.category).slice(0, 4);
+}
+
+const defaultDescription = (name: string, category: string) =>
+  `The ${name} is built for riders who expect their ${category.toLowerCase()} to keep up mile after mile. Precision machined from durable materials, it delivers reliable performance on tarmac, gravel and rough singletrack alike, while staying light enough to keep your bike responsive. Every unit is inspected in our workshop before it ships, and our mechanics are happy to fit it for you in store.`;
+
+const defaultHighlights = [
+  "CNC machined for a precise, rattle-free fit",
+  "Weather sealed bearings and hardware",
+  "Compatible with most modern frame standards",
+  "2 year manufacturer warranty",
+];
+
+const defaultSpecs = (category: string) => [
+  { label: "Category", value: category },
+  { label: "Material", value: "6061-T6 Aluminum / Carbon" },
+  { label: "Weight", value: "342 g" },
+  { label: "Colour", value: "Matte Black" },
+  { label: "Warranty", value: "24 months" },
+];
+
 
 export const products: Product[] = [
   {
