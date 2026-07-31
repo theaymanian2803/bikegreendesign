@@ -1,4 +1,6 @@
+import { Link } from "@tanstack/react-router";
 import { Star } from "lucide-react";
+
 import type { Product } from "@/data/products";
 
 function Stars({ rating }: { rating: number }) {
