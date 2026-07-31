@@ -165,6 +165,17 @@ const baseProducts: Product[] = [
   },
 ];
 
+export const products: Product[] = baseProducts.map((p, i) => ({
+  ...p,
+  brand: p.brand ?? ["Cyclify", "RoamZone", "MegaMod", "QuickCart"][i % 4],
+  sku: p.sku ?? `PW-${String(1000 + i * 7)}`,
+  description: p.description ?? defaultDescription(p.name, p.category),
+  highlights: p.highlights ?? defaultHighlights,
+  specs: p.specs ?? defaultSpecs(p.category),
+}));
+
+
+
 export const gearProducts = products.slice(0, 8);
 export const partProducts = [products[6], products[3], products[5], products[2]];
 
