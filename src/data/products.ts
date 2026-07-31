@@ -16,9 +16,48 @@ export type Product = {
   image: string;
   badge?: string;
   category: string;
+  brand?: string;
+  sku?: string;
+  description?: string;
+  highlights?: string[];
+  specs?: { label: string; value: string }[];
+  gallery?: string[];
 };
 
-export const products: Product[] = [
+export const galleryPool = [derailleur, wheel, crank, stem, suspension];
+
+export function getProduct(id: string) {
+  return products.find((p) => p.id === id);
+}
+
+export function productGallery(p: Product) {
+  return p.gallery ?? [p.image, ...galleryPool.filter((g) => g !== p.image).slice(0, 3)];
+}
+
+export function relatedProducts(p: Product) {
+  return products.filter((x) => x.id !== p.id && x.category === p.category).slice(0, 4);
+}
+
+const defaultDescription = (name: string, category: string) =>
+  `The ${name} is built for riders who expect their ${category.toLowerCase()} to keep up mile after mile. Precision machined from durable materials, it delivers reliable performance on tarmac, gravel and rough singletrack alike, while staying light enough to keep your bike responsive. Every unit is inspected in our workshop before it ships, and our mechanics are happy to fit it for you in store.`;
+
+const defaultHighlights = [
+  "CNC machined for a precise, rattle-free fit",
+  "Weather sealed bearings and hardware",
+  "Compatible with most modern frame standards",
+  "2 year manufacturer warranty",
+];
+
+const defaultSpecs = (category: string) => [
+  { label: "Category", value: category },
+  { label: "Material", value: "6061-T6 Aluminum / Carbon" },
+  { label: "Weight", value: "342 g" },
+  { label: "Colour", value: "Matte Black" },
+  { label: "Warranty", value: "24 months" },
+];
+
+
+const baseProducts: Product[] = [
   {
     id: "mtb-derailleur",
     name: "MTB Mountain Bike Mech Derailleur In Black Long",
@@ -125,6 +164,17 @@ export const products: Product[] = [
     category: "Rider Clothing",
   },
 ];
+
+export const products: Product[] = baseProducts.map((p, i) => ({
+  ...p,
+  brand: p.brand ?? ["Cyclify", "RoamZone", "MegaMod", "QuickCart"][i % 4],
+  sku: p.sku ?? `PW-${String(1000 + i * 7)}`,
+  description: p.description ?? defaultDescription(p.name, p.category),
+  highlights: p.highlights ?? defaultHighlights,
+  specs: p.specs ?? defaultSpecs(p.category),
+}));
+
+
 
 export const gearProducts = products.slice(0, 8);
 export const partProducts = [products[6], products[3], products[5], products[2]];
