@@ -57,7 +57,7 @@ const defaultSpecs = (category: string) => [
 ];
 
 
-export const products: Product[] = [
+const baseProducts: Product[] = [
   {
     id: "mtb-derailleur",
     name: "MTB Mountain Bike Mech Derailleur In Black Long",
