@@ -1,6 +1,9 @@
 import { Link } from "@tanstack/react-router";
 import { Heart, MapPin, Mail, Phone, Search, ShoppingCart, User, ChevronDown } from "lucide-react";
 
+import { useCart } from "@/lib/cart";
+
+
 const nav = [
   { label: "Home", to: "/" },
   { label: "Shop", to: "/shop", caret: true },
@@ -11,7 +14,9 @@ const nav = [
 ];
 
 export function Header() {
+  const { count } = useCart();
   return (
+
     <header className="w-full">
       <div className="hidden border-b border-border bg-topbar text-topbar-foreground lg:block">
         <div className="mx-auto flex max-w-[1200px] items-center justify-between px-4 py-2 text-xs">
@@ -70,12 +75,13 @@ export function Header() {
                 0
               </span>
             </span>
-            <span className="relative">
+            <Link to="/cart" className="relative" aria-label="View cart">
               <ShoppingCart className="size-5" />
               <span className="absolute -right-2 -top-2 flex size-4 items-center justify-center rounded-full bg-primary text-[10px] text-primary-foreground">
-                0
+                {count}
               </span>
-            </span>
+            </Link>
+
           </div>
         </div>
         <nav className="flex items-center gap-5 overflow-x-auto border-t border-border px-4 py-3 lg:hidden">
