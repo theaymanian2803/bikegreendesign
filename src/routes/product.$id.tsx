@@ -74,7 +74,17 @@ function ProductDetail() {
   const [active, setActive] = useState(0);
   const [qty, setQty] = useState(1);
   const [tab, setTab] = useState<"description" | "details" | "reviews">("description");
+  const [added, setAdded] = useState(false);
+  const { add } = useCart();
+  const navigate = useNavigate();
   const soldOut = product.badge === "Out of stock";
+
+  const handleAdd = () => {
+    add({ id: product.id, name: product.name, price: product.price, image: product.image }, qty);
+    setAdded(true);
+    window.setTimeout(() => setAdded(false), 2000);
+  };
+
 
   return (
     <div className="min-h-screen bg-background">
