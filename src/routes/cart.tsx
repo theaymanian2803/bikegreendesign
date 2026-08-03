@@ -177,9 +177,9 @@ function CartPage() {
               <p className="mt-3 text-[11px] text-muted-foreground">
                 Free delivery on orders over $300. Taxes included.
               </p>
-              <button type="button" className="btn-brand mt-5 w-full">
+              <Link to="/checkout" className="btn-brand mt-5 block w-full text-center">
                 Proceed to checkout
-              </button>
+              </Link>
             </aside>
           </div>
         )}
