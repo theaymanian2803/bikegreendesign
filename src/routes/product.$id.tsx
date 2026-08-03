@@ -1,10 +1,12 @@
 import { useState } from "react";
-import { createFileRoute, Link, notFound } from "@tanstack/react-router";
+import { createFileRoute, Link, useNavigate, notFound } from "@tanstack/react-router";
 import { Star, Check, Truck, ShieldCheck, RotateCcw, Minus, Plus, Heart } from "lucide-react";
 import { Header } from "@/components/site/Header";
 import { Footer } from "@/components/site/Footer";
 import { ProductCard } from "@/components/site/ProductCard";
+import { useCart } from "@/lib/cart";
 import { getProduct, productGallery, relatedProducts } from "@/data/products";
+
 
 export const Route = createFileRoute("/product/$id")({
   loader: ({ params }) => {
@@ -72,7 +74,17 @@ function ProductDetail() {
   const [active, setActive] = useState(0);
   const [qty, setQty] = useState(1);
   const [tab, setTab] = useState<"description" | "details" | "reviews">("description");
+  const [added, setAdded] = useState(false);
+  const { add } = useCart();
+  const navigate = useNavigate();
   const soldOut = product.badge === "Out of stock";
+
+  const handleAdd = () => {
+    add({ id: product.id, name: product.name, price: product.price, image: product.image }, qty);
+    setAdded(true);
+    window.setTimeout(() => setAdded(false), 2000);
+  };
+
 
   return (
     <div className="min-h-screen bg-background">
@@ -207,8 +219,24 @@ function ProductDetail() {
                   <Plus className="size-3.5" />
                 </button>
               </div>
-              <button type="button" disabled={soldOut} className="btn-brand disabled:opacity-50">
-                {soldOut ? "Out of stock" : "Add to cart"}
+              <button
+                type="button"
+                disabled={soldOut}
+                onClick={handleAdd}
+                className="btn-brand disabled:opacity-50"
+              >
+                {soldOut ? "Out of stock" : added ? "Added to cart ✓" : "Add to cart"}
+              </button>
+              <button
+                type="button"
+                disabled={soldOut}
+                onClick={() => {
+                  handleAdd();
+                  void navigate({ to: "/cart" });
+                }}
+                className="border border-ink px-5 py-2.5 font-display text-[13px] font-bold uppercase tracking-wide text-ink transition-colors hover:border-primary hover:text-primary disabled:opacity-50"
+              >
+                Buy now
               </button>
               <button
                 type="button"
@@ -217,6 +245,7 @@ function ProductDetail() {
               >
                 <Heart className="size-4" />
               </button>
+
             </div>
 
             <div className="mt-7 grid gap-3 border-t border-border pt-5 sm:grid-cols-3">
