@@ -219,8 +219,24 @@ function ProductDetail() {
                   <Plus className="size-3.5" />
                 </button>
               </div>
-              <button type="button" disabled={soldOut} className="btn-brand disabled:opacity-50">
-                {soldOut ? "Out of stock" : "Add to cart"}
+              <button
+                type="button"
+                disabled={soldOut}
+                onClick={handleAdd}
+                className="btn-brand disabled:opacity-50"
+              >
+                {soldOut ? "Out of stock" : added ? "Added to cart ✓" : "Add to cart"}
+              </button>
+              <button
+                type="button"
+                disabled={soldOut}
+                onClick={() => {
+                  handleAdd();
+                  void navigate({ to: "/cart" });
+                }}
+                className="border border-ink px-5 py-2.5 font-display text-[13px] font-bold uppercase tracking-wide text-ink transition-colors hover:border-primary hover:text-primary disabled:opacity-50"
+              >
+                Buy now
               </button>
               <button
                 type="button"
@@ -229,6 +245,7 @@ function ProductDetail() {
               >
                 <Heart className="size-4" />
               </button>
+
             </div>
 
             <div className="mt-7 grid gap-3 border-t border-border pt-5 sm:grid-cols-3">
