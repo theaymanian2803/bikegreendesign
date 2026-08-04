@@ -96,6 +96,15 @@ export function Header() {
 
           </div>
         </div>
+
+        {openMenu ? (
+          <div className="absolute inset-x-0 top-full z-50 hidden lg:block">
+            <div className="mx-auto max-w-[1400px] px-4">
+              <MegaMenu menuKey={openMenu} />
+            </div>
+          </div>
+        ) : null}
+
         <nav className="flex items-center gap-5 overflow-x-auto border-t border-border px-4 py-3 lg:hidden">
           {nav.map((item) => (
             <Link
