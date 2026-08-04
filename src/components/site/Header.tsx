@@ -1,20 +1,23 @@
+import { useState } from "react";
 import { Link } from "@tanstack/react-router";
 import { Heart, MapPin, Mail, Phone, Search, ShoppingCart, User, ChevronDown } from "lucide-react";
 
 import { useCart } from "@/lib/cart";
+import { MegaMenu } from "@/components/site/MegaMenu";
 
 
 const nav = [
   { label: "Home", to: "/" },
-  { label: "Shop", to: "/shop", caret: true },
-  { label: "Categories", to: "/shop", caret: true, tag: "New" },
-  { label: "Products", to: "/shop", caret: true, tag: "Hot" },
-  { label: "Top Deals", to: "/shop", caret: true },
-  { label: "Elements", to: "/shop", caret: true },
+  { label: "Shop", to: "/shop", caret: true, menuKey: "shop" },
+  { label: "Categories", to: "/shop", caret: true, tag: "New", menuKey: "categories" },
+  { label: "Products", to: "/shop", caret: true, tag: "Hot", menuKey: "products" },
+  { label: "Top Deals", to: "/shop", caret: true, menuKey: "top-deals" },
+  { label: "Elements", to: "/shop", caret: true, menuKey: "elements" },
 ];
 
 export function Header() {
   const { count } = useCart();
+  const [openMenu, setOpenMenu] = useState<string | null>(null);
   return (
 
     <header className="w-full">
@@ -40,7 +43,10 @@ export function Header() {
         </div>
       </div>
 
-      <div className="border-b border-border bg-background">
+      <div
+        className="relative border-b border-border bg-background"
+        onMouseLeave={() => setOpenMenu(null)}
+      >
         <div className="mx-auto flex max-w-[1200px] items-center justify-between gap-6 px-4 py-4">
           <Link to="/" className="flex items-center font-display text-2xl font-bold tracking-tight">
             <span className="rounded-sm bg-primary px-2 py-0.5 text-primary-foreground">Path</span>
@@ -53,7 +59,12 @@ export function Header() {
                 key={item.label}
                 to={item.to}
                 activeProps={{ className: "text-primary" }}
-                className="flex items-center gap-1 font-display text-[13px] font-bold uppercase tracking-wide text-ink transition-colors hover:text-primary"
+                onMouseEnter={() => setOpenMenu(item.menuKey ?? null)}
+                onFocus={() => setOpenMenu(item.menuKey ?? null)}
+                aria-expanded={item.menuKey ? openMenu === item.menuKey : undefined}
+                className={`flex items-center gap-1 font-display text-[13px] font-bold uppercase tracking-wide transition-colors hover:text-primary ${
+                  openMenu && openMenu === item.menuKey ? "text-primary" : "text-ink"
+                }`}
               >
                 {item.label}
                 {item.tag ? (
@@ -65,6 +76,7 @@ export function Header() {
               </Link>
             ))}
           </nav>
+
 
           <div className="flex items-center gap-4 text-ink">
             <Search className="size-5" />
@@ -84,6 +96,15 @@ export function Header() {
 
           </div>
         </div>
+
+        {openMenu ? (
+          <div className="absolute inset-x-0 top-full z-50 hidden lg:block">
+            <div className="mx-auto max-w-[1400px] px-4">
+              <MegaMenu menuKey={openMenu} />
+            </div>
+          </div>
+        ) : null}
+
         <nav className="flex items-center gap-5 overflow-x-auto border-t border-border px-4 py-3 lg:hidden">
           {nav.map((item) => (
             <Link
