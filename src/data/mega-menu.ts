@@ -1,28 +1,16 @@
-import helmetRed from "@/assets/p-helmet-red.jpg";
-import helmetBlack from "@/assets/p-helmet-black.jpg";
-import helmetPink from "@/assets/p-helmet-pink.jpg";
-import derailleur from "@/assets/p-derailleur.jpg";
-import crank from "@/assets/p-crank.jpg";
-import suspension from "@/assets/p-suspension.jpg";
-import stem from "@/assets/p-stem.jpg";
-import wheel from "@/assets/p-wheel.jpg";
-import heroSnow from "@/assets/hero-bike-snow.jpg";
-import ctaRoad from "@/assets/cta-road.jpg";
+import { supabase } from "@/integrations/supabase/client";
 
 /**
- * Mega menu content model.
+ * Mega menu content model — now database driven.
  *
- * Everything below is shaped so it can be swapped for a database source later:
- * `getMegaMenu(menuKey)` is async and is the only thing components call. When a
- * backend exists, replace the body of `getMegaMenu` with a query (server fn /
- * table read) that returns the exact same shapes — no component changes needed.
+ * Tables: `mega_menus`, `mega_menu_categories`, `mega_menu_products`.
+ * Components only ever call `getMegaMenu(menuKey)` / `getMegaMenuSync(menuKey)`.
  */
 
 export type MegaMenuCategory = {
   id: string;
   label: string;
   image: string;
-  /** Route path to open, e.g. "/shop". Kept as data for CMS-driven links. */
   href: string;
 };
 
@@ -33,8 +21,7 @@ export type MegaMenuProduct = {
   oldPrice?: number;
   image: string;
   badge?: string;
-  /** Optional product route id; falls back to `id`. */
-  productId?: string;
+  href: string;
 };
 
 export type MegaMenuBanner = {
@@ -44,6 +31,7 @@ export type MegaMenuBanner = {
 
 export type MegaMenuContent = {
   key: string;
+  title: string;
   categoriesTitle: string;
   categories: MegaMenuCategory[];
   productsTitle: string;
@@ -52,124 +40,63 @@ export type MegaMenuContent = {
   rightBanner?: MegaMenuBanner;
 };
 
-const cat = (id: string, label: string, image: string): MegaMenuCategory => ({
-  id,
-  label,
-  image,
-  href: "/shop",
-});
+/** Menu tabs that render a dropdown. Mirrors the seeded rows in `mega_menus`. */
+export const megaMenuKeys = ["shop", "categories", "products", "top-deals", "elements"];
 
-const sharedCategories: MegaMenuCategory[] = [
-  cat("helmets", "Helmets", helmetRed),
-  cat("folding-bikes", "Folding Bikes", suspension),
-  cat("repair-stands", "Repair Stands", derailleur),
-  cat("road-bikes", "Road Bikes", crank),
-  cat("chain-lubricants", "Chain Lubricants", crank),
-  cat("kickstands", "Kickstands", stem),
-  cat("monocycles", "Monocycles", wheel),
-  cat("mountain-bikes", "Mountain Bikes", helmetBlack),
-];
+const cache = new Map<string, MegaMenuContent>();
 
-const sharedProducts: MegaMenuProduct[] = [
-  {
-    id: "calandis-stem",
-    name: "110mm Adjustable Adustable Stem Bicycle Handlebar",
-    price: 195,
-    image: stem,
-  },
-  {
-    id: "djc-chainring",
-    name: "Shimano Alivio Crank Crankset Chainring 170mm",
-    price: 372,
-    oldPrice: 400,
-    image: crank,
-    badge: "-7%",
-  },
-  {
-    id: "giro-syntax",
-    name: "Schrodinger Adult Bicycle Cycle Road Helmet",
-    price: 340,
-    image: helmetBlack,
-  },
-  {
-    id: "fcc-racing",
-    name: "4pcs Mountain Bike Lock Bicycle Disc Rotor",
-    price: 333,
-    oldPrice: 370,
-    image: suspension,
-    badge: "-10%",
-  },
-  {
-    id: "toronto-crank",
-    name: "Moxic Aluminium Alloy Bicycle Stem Riser",
-    price: 299,
-    image: crank,
-  },
-  {
-    id: "bullseye-wheels",
-    name: "Trending Fuji Silhouette 1.7 Disc Wheelset",
-    price: 650,
-    image: wheel,
-    badge: "Pack",
-  },
-];
+function banner(image: string | null, alt: string | null): MegaMenuBanner | undefined {
+  return image ? { image, alt: alt ?? "" } : undefined;
+}
 
-const menus: Record<string, MegaMenuContent> = {
-  shop: {
-    key: "shop",
-    categoriesTitle: "Shop By",
-    categories: sharedCategories,
-    productsTitle: "Top Rated",
-    products: sharedProducts,
-    leftBanner: { image: heroSnow, alt: "Mountain bike in the snow" },
-    rightBanner: { image: ctaRoad, alt: "Road bike wheel close up" },
-  },
-  categories: {
-    key: "categories",
-    categoriesTitle: "Shop By",
-    categories: sharedCategories,
-    productsTitle: "Top Rated",
-    products: sharedProducts,
-    leftBanner: { image: heroSnow, alt: "Mountain bike in the snow" },
-    rightBanner: { image: ctaRoad, alt: "Road bike wheel close up" },
-  },
-  products: {
-    key: "products",
-    categoriesTitle: "Shop By",
-    categories: sharedCategories,
-    productsTitle: "Best Sellers",
-    products: sharedProducts,
-    leftBanner: { image: heroSnow, alt: "Mountain bike in the snow" },
-    rightBanner: { image: ctaRoad, alt: "Road bike wheel close up" },
-  },
-  "top-deals": {
-    key: "top-deals",
-    categoriesTitle: "Shop By",
-    categories: sharedCategories,
-    productsTitle: "Top Deals",
-    products: sharedProducts,
-    leftBanner: { image: heroSnow, alt: "Mountain bike in the snow" },
-    rightBanner: { image: ctaRoad, alt: "Road bike wheel close up" },
-  },
-  elements: {
-    key: "elements",
-    categoriesTitle: "Shop By",
-    categories: sharedCategories,
-    productsTitle: "Top Rated",
-    products: sharedProducts,
-    leftBanner: { image: heroSnow, alt: "Mountain bike in the snow" },
-    rightBanner: { image: ctaRoad, alt: "Road bike wheel close up" },
-  },
-};
-
-/** Synchronous fallback used for the first render / SSR. */
+/** Cached content for the first (synchronous) render. */
 export function getMegaMenuSync(menuKey: string): MegaMenuContent | undefined {
-  return menus[menuKey];
+  return cache.get(menuKey);
 }
 
-/** Single data entry point — swap this for a DB/server-fn call later. */
+/** Single data entry point — reads the mega menu tables. */
 export async function getMegaMenu(menuKey: string): Promise<MegaMenuContent | undefined> {
-  return menus[menuKey];
-}
+  const [menuRes, catRes, prodRes] = await Promise.all([
+    supabase.from("mega_menus").select("*").eq("key", menuKey).maybeSingle(),
+    supabase
+      .from("mega_menu_categories")
+      .select("*")
+      .eq("menu_key", menuKey)
+      .order("sort_order", { ascending: true }),
+    supabase
+      .from("mega_menu_products")
+      .select("*")
+      .eq("menu_key", menuKey)
+      .order("sort_order", { ascending: true }),
+  ]);
 
-export const megaMenuKeys = Object.keys(menus);
+  const menu = menuRes.data;
+  if (!menu) return undefined;
+
+  const content: MegaMenuContent = {
+    key: menu.key,
+    title: menu.title,
+    categoriesTitle: menu.categories_title,
+    productsTitle: menu.products_title,
+    categories: (catRes.data ?? []).map((c) => ({
+      id: c.id,
+      label: c.label,
+      image: c.image_url,
+      href: c.href,
+    })),
+    products: (prodRes.data ?? []).map((p) => ({
+      id: p.id,
+      name: p.name,
+      price: Number(p.price),
+      oldPrice: p.old_price === null ? undefined : Number(p.old_price),
+      image: p.image_url,
+      badge: p.badge ?? undefined,
+      href: p.href,
+    })),
+    leftBanner: banner(menu.left_banner_image, menu.left_banner_alt),
+    rightBanner: banner(menu.right_banner_image, menu.right_banner_alt),
+  };
+
+  cache.set(menuKey, content);
+  return content;
+}
