@@ -14,7 +14,139 @@ export type Database = {
   }
   public: {
     Tables: {
-      [_ in never]: never
+      mega_menu_categories: {
+        Row: {
+          created_at: string
+          href: string
+          id: string
+          image_url: string
+          label: string
+          menu_key: string
+          sort_order: number
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          href?: string
+          id?: string
+          image_url?: string
+          label: string
+          menu_key: string
+          sort_order?: number
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          href?: string
+          id?: string
+          image_url?: string
+          label?: string
+          menu_key?: string
+          sort_order?: number
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "mega_menu_categories_menu_key_fkey"
+            columns: ["menu_key"]
+            isOneToOne: false
+            referencedRelation: "mega_menus"
+            referencedColumns: ["key"]
+          },
+        ]
+      }
+      mega_menu_products: {
+        Row: {
+          badge: string | null
+          created_at: string
+          href: string
+          id: string
+          image_url: string
+          menu_key: string
+          name: string
+          old_price: number | null
+          price: number
+          sort_order: number
+          updated_at: string
+        }
+        Insert: {
+          badge?: string | null
+          created_at?: string
+          href?: string
+          id?: string
+          image_url?: string
+          menu_key: string
+          name: string
+          old_price?: number | null
+          price?: number
+          sort_order?: number
+          updated_at?: string
+        }
+        Update: {
+          badge?: string | null
+          created_at?: string
+          href?: string
+          id?: string
+          image_url?: string
+          menu_key?: string
+          name?: string
+          old_price?: number | null
+          price?: number
+          sort_order?: number
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "mega_menu_products_menu_key_fkey"
+            columns: ["menu_key"]
+            isOneToOne: false
+            referencedRelation: "mega_menus"
+            referencedColumns: ["key"]
+          },
+        ]
+      }
+      mega_menus: {
+        Row: {
+          categories_title: string
+          created_at: string
+          key: string
+          left_banner_alt: string | null
+          left_banner_image: string | null
+          products_title: string
+          right_banner_alt: string | null
+          right_banner_image: string | null
+          sort_order: number
+          title: string
+          updated_at: string
+        }
+        Insert: {
+          categories_title?: string
+          created_at?: string
+          key: string
+          left_banner_alt?: string | null
+          left_banner_image?: string | null
+          products_title?: string
+          right_banner_alt?: string | null
+          right_banner_image?: string | null
+          sort_order?: number
+          title: string
+          updated_at?: string
+        }
+        Update: {
+          categories_title?: string
+          created_at?: string
+          key?: string
+          left_banner_alt?: string | null
+          left_banner_image?: string | null
+          products_title?: string
+          right_banner_alt?: string | null
+          right_banner_image?: string | null
+          sort_order?: number
+          title?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never
