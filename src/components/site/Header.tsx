@@ -1,20 +1,23 @@
+import { useState } from "react";
 import { Link } from "@tanstack/react-router";
 import { Heart, MapPin, Mail, Phone, Search, ShoppingCart, User, ChevronDown } from "lucide-react";
 
 import { useCart } from "@/lib/cart";
+import { MegaMenu } from "@/components/site/MegaMenu";
 
 
 const nav = [
   { label: "Home", to: "/" },
-  { label: "Shop", to: "/shop", caret: true },
-  { label: "Categories", to: "/shop", caret: true, tag: "New" },
-  { label: "Products", to: "/shop", caret: true, tag: "Hot" },
-  { label: "Top Deals", to: "/shop", caret: true },
-  { label: "Elements", to: "/shop", caret: true },
+  { label: "Shop", to: "/shop", caret: true, menuKey: "shop" },
+  { label: "Categories", to: "/shop", caret: true, tag: "New", menuKey: "categories" },
+  { label: "Products", to: "/shop", caret: true, tag: "Hot", menuKey: "products" },
+  { label: "Top Deals", to: "/shop", caret: true, menuKey: "top-deals" },
+  { label: "Elements", to: "/shop", caret: true, menuKey: "elements" },
 ];
 
 export function Header() {
   const { count } = useCart();
+  const [openMenu, setOpenMenu] = useState<string | null>(null);
   return (
 
     <header className="w-full">
