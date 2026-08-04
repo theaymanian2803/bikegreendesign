@@ -43,7 +43,10 @@ export function Header() {
         </div>
       </div>
 
-      <div className="border-b border-border bg-background">
+      <div
+        className="relative border-b border-border bg-background"
+        onMouseLeave={() => setOpenMenu(null)}
+      >
         <div className="mx-auto flex max-w-[1200px] items-center justify-between gap-6 px-4 py-4">
           <Link to="/" className="flex items-center font-display text-2xl font-bold tracking-tight">
             <span className="rounded-sm bg-primary px-2 py-0.5 text-primary-foreground">Path</span>
@@ -56,7 +59,12 @@ export function Header() {
                 key={item.label}
                 to={item.to}
                 activeProps={{ className: "text-primary" }}
-                className="flex items-center gap-1 font-display text-[13px] font-bold uppercase tracking-wide text-ink transition-colors hover:text-primary"
+                onMouseEnter={() => setOpenMenu(item.menuKey ?? null)}
+                onFocus={() => setOpenMenu(item.menuKey ?? null)}
+                aria-expanded={item.menuKey ? openMenu === item.menuKey : undefined}
+                className={`flex items-center gap-1 font-display text-[13px] font-bold uppercase tracking-wide transition-colors hover:text-primary ${
+                  openMenu && openMenu === item.menuKey ? "text-primary" : "text-ink"
+                }`}
               >
                 {item.label}
                 {item.tag ? (
@@ -68,6 +76,7 @@ export function Header() {
               </Link>
             ))}
           </nav>
+
 
           <div className="flex items-center gap-4 text-ink">
             <Search className="size-5" />
