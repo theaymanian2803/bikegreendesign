@@ -66,8 +66,7 @@ export function MegaMenu({ menuKey }: { menuKey: string }) {
           {content.products.map((p) => (
             <Link
               key={p.id}
-              to="/product/$id"
-              params={{ id: p.productId ?? p.id }}
+              to={p.href}
               className="group flex items-center gap-3 bg-background p-3"
             >
               <span className="relative shrink-0 overflow-hidden bg-surface">
