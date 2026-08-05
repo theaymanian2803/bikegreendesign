@@ -97,36 +97,15 @@ function Thumb({ src }: { src: string }) {
 }
 
 function AdminPage() {
-  const navigate = useNavigate();
   const [menus, setMenus] = useState<MenuRow[]>([]);
   const [activeKey, setActiveKey] = useState<string>("");
   const [categories, setCategories] = useState<CategoryRow[]>([]);
   const [products, setProducts] = useState<ProductRow[]>([]);
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
-  const [isAdmin, setIsAdmin] = useState<boolean | null>(null);
-  const [email, setEmail] = useState<string>("");
 
   const menu = useMemo(() => menus.find((m) => m.key === activeKey), [menus, activeKey]);
 
-  useEffect(() => {
-    (async () => {
-      const { data: userData } = await supabase.auth.getUser();
-      setEmail(userData.user?.email ?? "");
-      if (!userData.user) return setIsAdmin(false);
-      const { data, error } = await supabase.rpc("has_role", {
-        _user_id: userData.user.id,
-        _role: "admin",
-      });
-      if (error) toast.error(error.message);
-      setIsAdmin(Boolean(data));
-    })();
-  }, []);
-
-  async function signOut() {
-    await supabase.auth.signOut();
-    navigate({ to: "/auth", replace: true });
-  }
 
 
   useEffect(() => {
