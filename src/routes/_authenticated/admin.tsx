@@ -269,8 +269,24 @@ function AdminPage() {
     setProducts((prev) => prev.filter((p) => p.id !== id));
   }
 
-  if (loading) {
+  if (loading || isAdmin === null) {
     return <div className="container mx-auto px-4 py-20 font-sans text-muted-foreground">Loading…</div>;
+  }
+
+  if (!isAdmin) {
+    return (
+      <main className="container mx-auto px-4 py-20">
+        <p className="section-label">Admin</p>
+        <h1 className="font-display text-3xl font-bold text-ink">Access denied</h1>
+        <p className="mt-2 max-w-md font-sans text-sm text-muted-foreground">
+          {email ? `${email} is not an admin account.` : "You are not signed in as an admin."} Ask an
+          existing admin to grant you access.
+        </p>
+        <Button variant="outline" className="mt-6" onClick={signOut}>
+          <LogOut className="mr-2 size-4" /> Sign out
+        </Button>
+      </main>
+    );
   }
 
   return (
@@ -280,14 +296,20 @@ function AdminPage() {
           <p className="section-label">Admin</p>
           <h1 className="font-display text-3xl font-bold text-ink">Mega menu content</h1>
           <p className="mt-1 font-sans text-sm text-muted-foreground">
-            Images, labels and link targets for every dropdown in the main navigation.
+            Signed in as {email} — images, labels and link targets for every dropdown.
           </p>
         </div>
-        <Button onClick={saveAll} disabled={saving} className="btn-brand">
-          <Save className="mr-2 size-4" />
-          {saving ? "Saving…" : "Save changes"}
-        </Button>
+        <div className="flex gap-2">
+          <Button onClick={saveAll} disabled={saving} className="btn-brand">
+            <Save className="mr-2 size-4" />
+            {saving ? "Saving…" : "Save changes"}
+          </Button>
+          <Button variant="outline" onClick={signOut}>
+            <LogOut className="mr-2 size-4" /> Sign out
+          </Button>
+        </div>
       </header>
+
 
       <div className="mt-8 flex flex-wrap gap-2">
         {menus.map((m) => (
