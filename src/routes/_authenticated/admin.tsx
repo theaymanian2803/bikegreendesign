@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useState } from "react";
-import { createFileRoute } from "@tanstack/react-router";
-import { Plus, Save, Trash2 } from "lucide-react";
+import { createFileRoute, useNavigate } from "@tanstack/react-router";
+import { LogOut, Plus, Save, Trash2 } from "lucide-react";
 import { toast } from "sonner";
 
 import { supabase } from "@/integrations/supabase/client";
@@ -8,7 +8,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 
-export const Route = createFileRoute("/admin")({
+export const Route = createFileRoute("/_authenticated/admin")({
   head: () => ({
     meta: [
       { title: "Mega Menu Admin — Pathway" },
@@ -97,14 +97,37 @@ function Thumb({ src }: { src: string }) {
 }
 
 function AdminPage() {
+  const navigate = useNavigate();
   const [menus, setMenus] = useState<MenuRow[]>([]);
   const [activeKey, setActiveKey] = useState<string>("");
   const [categories, setCategories] = useState<CategoryRow[]>([]);
   const [products, setProducts] = useState<ProductRow[]>([]);
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
+  const [isAdmin, setIsAdmin] = useState<boolean | null>(null);
+  const [email, setEmail] = useState<string>("");
 
   const menu = useMemo(() => menus.find((m) => m.key === activeKey), [menus, activeKey]);
+
+  useEffect(() => {
+    (async () => {
+      const { data: userData } = await supabase.auth.getUser();
+      setEmail(userData.user?.email ?? "");
+      if (!userData.user) return setIsAdmin(false);
+      const { data, error } = await supabase.rpc("has_role", {
+        _user_id: userData.user.id,
+        _role: "admin",
+      });
+      if (error) toast.error(error.message);
+      setIsAdmin(Boolean(data));
+    })();
+  }, []);
+
+  async function signOut() {
+    await supabase.auth.signOut();
+    navigate({ to: "/auth", replace: true });
+  }
+
 
   useEffect(() => {
     (async () => {
@@ -246,8 +269,24 @@ function AdminPage() {
     setProducts((prev) => prev.filter((p) => p.id !== id));
   }
 
-  if (loading) {
+  if (loading || isAdmin === null) {
     return <div className="container mx-auto px-4 py-20 font-sans text-muted-foreground">Loading…</div>;
+  }
+
+  if (!isAdmin) {
+    return (
+      <main className="container mx-auto px-4 py-20">
+        <p className="section-label">Admin</p>
+        <h1 className="font-display text-3xl font-bold text-ink">Access denied</h1>
+        <p className="mt-2 max-w-md font-sans text-sm text-muted-foreground">
+          {email ? `${email} is not an admin account.` : "You are not signed in as an admin."} Ask an
+          existing admin to grant you access.
+        </p>
+        <Button variant="outline" className="mt-6" onClick={signOut}>
+          <LogOut className="mr-2 size-4" /> Sign out
+        </Button>
+      </main>
+    );
   }
 
   return (
@@ -257,14 +296,20 @@ function AdminPage() {
           <p className="section-label">Admin</p>
           <h1 className="font-display text-3xl font-bold text-ink">Mega menu content</h1>
           <p className="mt-1 font-sans text-sm text-muted-foreground">
-            Images, labels and link targets for every dropdown in the main navigation.
+            Signed in as {email} — images, labels and link targets for every dropdown.
           </p>
         </div>
-        <Button onClick={saveAll} disabled={saving} className="btn-brand">
-          <Save className="mr-2 size-4" />
-          {saving ? "Saving…" : "Save changes"}
-        </Button>
+        <div className="flex gap-2">
+          <Button onClick={saveAll} disabled={saving} className="btn-brand">
+            <Save className="mr-2 size-4" />
+            {saving ? "Saving…" : "Save changes"}
+          </Button>
+          <Button variant="outline" onClick={signOut}>
+            <LogOut className="mr-2 size-4" /> Sign out
+          </Button>
+        </div>
       </header>
+
 
       <div className="mt-8 flex flex-wrap gap-2">
         {menus.map((m) => (
