@@ -11,6 +11,7 @@
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as AuthenticatedRouteRouteImport } from './routes/_authenticated/route'
+import { Route as CustomerRouteRouteImport } from './routes/_customer/route'
 import { Route as ActivateRouteImport } from './routes/activate'
 import { Route as AuthRouteImport } from './routes/auth'
 import { Route as CartRouteImport } from './routes/cart'
@@ -29,6 +30,8 @@ import { Route as AuthenticatedAdminReviewsRouteImport } from './routes/_authent
 import { Route as AuthenticatedAdminSettingsRouteImport } from './routes/_authenticated/admin/settings'
 import { Route as AuthenticatedAdminSetupRouteImport } from './routes/_authenticated/admin/setup'
 import { Route as AuthenticatedAdminUsersRouteImport } from './routes/_authenticated/admin/users'
+import { Route as CustomerAccountIndexRouteImport } from './routes/_customer/account/index'
+import { Route as CustomerAccountOrdersRouteImport } from './routes/_customer/account/orders'
 import { Route as ApiAuthGuestRouteImport } from './routes/api/auth/guest'
 import { Route as ApiAuthLoginRouteImport } from './routes/api/auth/login'
 import { Route as ApiAuthLogoutRouteImport } from './routes/api/auth/logout'
@@ -61,6 +64,10 @@ const IndexRoute = IndexRouteImport.update({
 } as any)
 const AuthenticatedRouteRoute = AuthenticatedRouteRouteImport.update({
   id: '/_authenticated',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const CustomerRouteRoute = CustomerRouteRouteImport.update({
+  id: '/_customer',
   getParentRoute: () => rootRouteImport,
 } as any)
 const ActivateRoute = ActivateRouteImport.update({
@@ -157,6 +164,16 @@ const AuthenticatedAdminUsersRoute = AuthenticatedAdminUsersRouteImport.update({
   id: '/users',
   path: '/users',
   getParentRoute: () => AuthenticatedAdminRouteRoute,
+} as any)
+const CustomerAccountIndexRoute = CustomerAccountIndexRouteImport.update({
+  id: '/account/',
+  path: '/account/',
+  getParentRoute: () => CustomerRouteRoute,
+} as any)
+const CustomerAccountOrdersRoute = CustomerAccountOrdersRouteImport.update({
+  id: '/account/orders',
+  path: '/account/orders',
+  getParentRoute: () => CustomerRouteRoute,
 } as any)
 const ApiAuthGuestRoute = ApiAuthGuestRouteImport.update({
   id: '/api/auth/guest',
@@ -300,6 +317,7 @@ export interface FileRoutesByFullPath {
   '/admin/settings': typeof AuthenticatedAdminSettingsRoute
   '/admin/setup': typeof AuthenticatedAdminSetupRoute
   '/admin/users': typeof AuthenticatedAdminUsersRoute
+  '/account/orders': typeof CustomerAccountOrdersRoute
   '/api/auth/guest': typeof ApiAuthGuestRoute
   '/api/auth/login': typeof ApiAuthLoginRoute
   '/api/auth/logout': typeof ApiAuthLogoutRoute
@@ -311,6 +329,7 @@ export interface FileRoutesByFullPath {
   '/api/mobile/newsletter': typeof ApiMobileNewsletterRoute
   '/api/mobile/reviews': typeof ApiMobileReviewsRoute
   '/admin/': typeof AuthenticatedAdminIndexRoute
+  '/account/': typeof CustomerAccountIndexRoute
   '/admin/orders/$orderId': typeof AuthenticatedAdminOrdersOrderIdRoute
   '/api/auth/google/callback': typeof ApiAuthGoogleCallbackRoute
   '/api/mobile/auth/guest': typeof ApiMobileAuthGuestRoute
@@ -344,6 +363,7 @@ export interface FileRoutesByTo {
   '/admin/settings': typeof AuthenticatedAdminSettingsRoute
   '/admin/setup': typeof AuthenticatedAdminSetupRoute
   '/admin/users': typeof AuthenticatedAdminUsersRoute
+  '/account/orders': typeof CustomerAccountOrdersRoute
   '/api/auth/guest': typeof ApiAuthGuestRoute
   '/api/auth/login': typeof ApiAuthLoginRoute
   '/api/auth/logout': typeof ApiAuthLogoutRoute
@@ -355,6 +375,7 @@ export interface FileRoutesByTo {
   '/api/mobile/newsletter': typeof ApiMobileNewsletterRoute
   '/api/mobile/reviews': typeof ApiMobileReviewsRoute
   '/admin': typeof AuthenticatedAdminIndexRoute
+  '/account': typeof CustomerAccountIndexRoute
   '/admin/orders/$orderId': typeof AuthenticatedAdminOrdersOrderIdRoute
   '/api/auth/google/callback': typeof ApiAuthGoogleCallbackRoute
   '/api/mobile/auth/guest': typeof ApiMobileAuthGuestRoute
@@ -374,6 +395,7 @@ export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
   '/_authenticated': typeof AuthenticatedRouteRouteWithChildren
+  '/_customer': typeof CustomerRouteRouteWithChildren
   '/activate': typeof ActivateRoute
   '/auth': typeof AuthRoute
   '/cart': typeof CartRoute
@@ -391,6 +413,7 @@ export interface FileRoutesById {
   '/_authenticated/admin/settings': typeof AuthenticatedAdminSettingsRoute
   '/_authenticated/admin/setup': typeof AuthenticatedAdminSetupRoute
   '/_authenticated/admin/users': typeof AuthenticatedAdminUsersRoute
+  '/_customer/account/orders': typeof CustomerAccountOrdersRoute
   '/api/auth/guest': typeof ApiAuthGuestRoute
   '/api/auth/login': typeof ApiAuthLoginRoute
   '/api/auth/logout': typeof ApiAuthLogoutRoute
@@ -402,6 +425,7 @@ export interface FileRoutesById {
   '/api/mobile/newsletter': typeof ApiMobileNewsletterRoute
   '/api/mobile/reviews': typeof ApiMobileReviewsRoute
   '/_authenticated/admin/': typeof AuthenticatedAdminIndexRoute
+  '/_customer/account/': typeof CustomerAccountIndexRoute
   '/_authenticated/admin/orders/$orderId': typeof AuthenticatedAdminOrdersOrderIdRoute
   '/api/auth/google/callback': typeof ApiAuthGoogleCallbackRoute
   '/api/mobile/auth/guest': typeof ApiMobileAuthGuestRoute
@@ -438,6 +462,7 @@ export interface FileRouteTypes {
     | '/admin/settings'
     | '/admin/setup'
     | '/admin/users'
+    | '/account/orders'
     | '/api/auth/guest'
     | '/api/auth/login'
     | '/api/auth/logout'
@@ -449,6 +474,7 @@ export interface FileRouteTypes {
     | '/api/mobile/newsletter'
     | '/api/mobile/reviews'
     | '/admin/'
+    | '/account/'
     | '/admin/orders/$orderId'
     | '/api/auth/google/callback'
     | '/api/mobile/auth/guest'
@@ -482,6 +508,7 @@ export interface FileRouteTypes {
     | '/admin/settings'
     | '/admin/setup'
     | '/admin/users'
+    | '/account/orders'
     | '/api/auth/guest'
     | '/api/auth/login'
     | '/api/auth/logout'
@@ -493,6 +520,7 @@ export interface FileRouteTypes {
     | '/api/mobile/newsletter'
     | '/api/mobile/reviews'
     | '/admin'
+    | '/account'
     | '/admin/orders/$orderId'
     | '/api/auth/google/callback'
     | '/api/mobile/auth/guest'
@@ -511,6 +539,7 @@ export interface FileRouteTypes {
     | '__root__'
     | '/'
     | '/_authenticated'
+    | '/_customer'
     | '/activate'
     | '/auth'
     | '/cart'
@@ -528,6 +557,7 @@ export interface FileRouteTypes {
     | '/_authenticated/admin/settings'
     | '/_authenticated/admin/setup'
     | '/_authenticated/admin/users'
+    | '/_customer/account/orders'
     | '/api/auth/guest'
     | '/api/auth/login'
     | '/api/auth/logout'
@@ -539,6 +569,7 @@ export interface FileRouteTypes {
     | '/api/mobile/newsletter'
     | '/api/mobile/reviews'
     | '/_authenticated/admin/'
+    | '/_customer/account/'
     | '/_authenticated/admin/orders/$orderId'
     | '/api/auth/google/callback'
     | '/api/mobile/auth/guest'
@@ -558,6 +589,7 @@ export interface FileRouteTypes {
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   AuthenticatedRouteRoute: typeof AuthenticatedRouteRouteWithChildren
+  CustomerRouteRoute: typeof CustomerRouteRouteWithChildren
   ActivateRoute: typeof ActivateRoute
   AuthRoute: typeof AuthRoute
   CartRoute: typeof CartRoute
@@ -603,6 +635,13 @@ declare module '@tanstack/react-router' {
       path: ''
       fullPath: '/'
       preLoaderRoute: typeof AuthenticatedRouteRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/_customer': {
+      id: '/_customer'
+      path: ''
+      fullPath: '/'
+      preLoaderRoute: typeof CustomerRouteRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/activate': {
@@ -730,6 +769,20 @@ declare module '@tanstack/react-router' {
       fullPath: '/admin/users'
       preLoaderRoute: typeof AuthenticatedAdminUsersRouteImport
       parentRoute: typeof AuthenticatedAdminRouteRoute
+    }
+    '/_customer/account/': {
+      id: '/_customer/account/'
+      path: '/account'
+      fullPath: '/account/'
+      preLoaderRoute: typeof CustomerAccountIndexRouteImport
+      parentRoute: typeof CustomerRouteRoute
+    }
+    '/_customer/account/orders': {
+      id: '/_customer/account/orders'
+      path: '/account/orders'
+      fullPath: '/account/orders'
+      preLoaderRoute: typeof CustomerAccountOrdersRouteImport
+      parentRoute: typeof CustomerRouteRoute
     }
     '/api/auth/guest': {
       id: '/api/auth/guest'
@@ -949,9 +1002,24 @@ const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
 const AuthenticatedRouteRouteWithChildren =
   AuthenticatedRouteRoute._addFileChildren(AuthenticatedRouteRouteChildren)
 
+interface CustomerRouteRouteChildren {
+  CustomerAccountOrdersRoute: typeof CustomerAccountOrdersRoute
+  CustomerAccountIndexRoute: typeof CustomerAccountIndexRoute
+}
+
+const CustomerRouteRouteChildren: CustomerRouteRouteChildren = {
+  CustomerAccountOrdersRoute: CustomerAccountOrdersRoute,
+  CustomerAccountIndexRoute: CustomerAccountIndexRoute,
+}
+
+const CustomerRouteRouteWithChildren = CustomerRouteRoute._addFileChildren(
+  CustomerRouteRouteChildren,
+)
+
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   AuthenticatedRouteRoute: AuthenticatedRouteRouteWithChildren,
+  CustomerRouteRoute: CustomerRouteRouteWithChildren,
   ActivateRoute: ActivateRoute,
   AuthRoute: AuthRoute,
   CartRoute: CartRoute,

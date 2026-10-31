@@ -1,4 +1,7 @@
 import { createServerFn } from "@tanstack/react-start";
+import { z } from "zod";
+
+import { requireAuth } from "@/integrations/turso/auth";
 
 // Server-only imports are loaded lazily so they stay out of the client bundle.
 const server = () => import("@/integrations/turso/auth.server");
@@ -25,3 +28,18 @@ export const signInDemoAdmin = createServerFn({ method: "POST" }).handler(async 
   const { signInDemoAdmin } = await import("@/integrations/turso/demo-admin.server");
   return signInDemoAdmin();
 });
+
+/** Renames the signed-in account. Email changes go through support. */
+export const updateProfile = createServerFn({ method: "POST" })
+  .middleware([requireAuth])
+  .validator((input) =>
+    z.object({ name: z.string().trim().min(1, "Enter your name").max(80) }).parse(input),
+  )
+  .handler(async ({ data, context }) => {
+    const { getTurso } = await import("@/integrations/turso/client");
+    await getTurso().execute({
+      sql: "UPDATE users SET display_name = ? WHERE id = ?",
+      args: [data.name, context.userId],
+    });
+    return { ok: true as const };
+  });

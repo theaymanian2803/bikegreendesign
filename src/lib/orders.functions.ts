@@ -2,6 +2,7 @@ import { createServerFn } from "@tanstack/react-start";
 import { z } from "zod";
 
 import { requireAuth } from "@/integrations/turso/auth";
+import { groupOrderHistory } from "@/lib/order-history";
 
 const turso = () => import("@/integrations/turso/client");
 
@@ -424,4 +425,48 @@ export const deleteOrder = createServerFn({ method: "POST" })
       args: [data.id],
     });
     return { ok: true };
+  });
+
+/** The signed-in customer's own order history, newest first. */
+export const listMyOrders = createServerFn({ method: "GET" })
+  .middleware([requireAuth])
+  .handler(async ({ context }) => {
+    const { getTurso } = await turso();
+    const client = getTurso();
+
+    const heads = await client.execute({
+      sql: `SELECT id, public_id, status, created_at, subtotal_cents, shipping_cents, total_cents
+            FROM orders WHERE user_id = ?
+            ORDER BY created_at DESC, id DESC`,
+      args: [context.userId],
+    });
+
+    if (heads.rows.length === 0) return [];
+
+    const ids = heads.rows.map((row) => Number(row.id));
+    const placeholders = ids.map(() => "?").join(", ");
+    const lines = await client.execute({
+      sql: `SELECT id, order_id, name, price_cents, qty FROM order_items
+            WHERE order_id IN (${placeholders}) ORDER BY id`,
+      args: ids,
+    });
+
+    return groupOrderHistory(
+      heads.rows.map((row) => ({
+        id: Number(row.id),
+        publicId: row.public_id === null ? null : String(row.public_id),
+        status: String(row.status),
+        createdAt: String(row.created_at),
+        subtotalCents: Number(row.subtotal_cents),
+        shippingCents: Number(row.shipping_cents),
+        totalCents: Number(row.total_cents),
+      })),
+      lines.rows.map((row) => ({
+        id: Number(row.id),
+        orderId: Number(row.order_id),
+        name: String(row.name),
+        priceCents: Number(row.price_cents),
+        qty: Number(row.qty),
+      })),
+    );
   });

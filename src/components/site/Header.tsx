@@ -108,6 +108,20 @@ export function Header() {
                         <p className="mt-0.5 truncate text-muted-foreground">{user.email}</p>
                         <div className="mt-3 space-y-2">
                           <Link
+                            to="/account"
+                            onClick={() => setAccountOpen(false)}
+                            className="block text-muted-foreground hover:text-primary"
+                          >
+                            Account
+                          </Link>
+                          <Link
+                            to="/account/orders"
+                            onClick={() => setAccountOpen(false)}
+                            className="block text-muted-foreground hover:text-primary"
+                          >
+                            My orders
+                          </Link>
+                          <Link
                             to="/favorites"
                             onClick={() => setAccountOpen(false)}
                             className="block text-muted-foreground hover:text-primary"
