@@ -1,0 +1,9 @@
+ALTER TABLE users ADD COLUMN password_hash TEXT;
+
+ALTER TABLE users ADD COLUMN display_name TEXT NOT NULL DEFAULT '';
+
+ALTER TABLE users ADD COLUMN is_guest INTEGER NOT NULL DEFAULT 0;
+
+ALTER TABLE orders ADD COLUMN user_id INTEGER REFERENCES users(id) ON DELETE SET NULL;
+
+CREATE INDEX IF NOT EXISTS idx_orders_user_id ON orders(user_id);
