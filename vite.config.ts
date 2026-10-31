@@ -54,6 +54,9 @@ export default defineConfig(async (env) => {
     server: {
       host: "::",
       port: 8080,
+      // Fail loudly instead of silently moving to 8081, 8082 … and leaving the
+      // browser pointed at a stale server on the expected port.
+      strictPort: true,
     },
   };
 });
