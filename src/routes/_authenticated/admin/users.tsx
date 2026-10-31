@@ -1,10 +1,17 @@
 import { useEffect, useState } from "react";
 import { createFileRoute } from "@tanstack/react-router";
-import { ShieldCheck, ShieldOff, Trash2 } from "lucide-react";
+import { KeyRound, ShieldCheck, ShieldOff, Trash2 } from "lucide-react";
 import { toast } from "sonner";
 
-import { deleteUser, listUsers, setAdminRole, type AdminUser } from "@/lib/admin.functions";
+import {
+  deleteUser,
+  listUsers,
+  setAdminRole,
+  setUserPassword,
+  type AdminUser,
+} from "@/lib/admin.functions";
 import { Button } from "@/components/ui/button";
+import { useAdminWriteGuard } from "@/hooks/use-admin-write-guard";
 
 export const Route = createFileRoute("/_authenticated/admin/users")({
   head: () => ({
@@ -28,6 +35,7 @@ function UsersPage() {
   const [users, setUsers] = useState<AdminUser[]>([]);
   const [loading, setLoading] = useState(true);
   const [busyId, setBusyId] = useState<string | null>(null);
+  const { requireWrite } = useAdminWriteGuard();
 
   async function load() {
     try {
@@ -43,6 +51,7 @@ function UsersPage() {
   }, []);
 
   async function toggleAdmin(user: AdminUser) {
+    if (!requireWrite()) return;
     setBusyId(user.id);
     try {
       await setAdminRole({ data: { userId: user.id, makeAdmin: !user.isAdmin } });
@@ -54,7 +63,32 @@ function UsersPage() {
     setBusyId(null);
   }
 
+  async function changePassword(user: AdminUser) {
+    if (!requireWrite()) return;
+    const bytes = new Uint8Array(6);
+    window.crypto.getRandomValues(bytes);
+    const suggested = `Tmp-${Array.from(bytes, (byte) => byte.toString(36).padStart(2, "0")).join("")}!`;
+    const password = window.prompt(
+      `Set a temporary password for ${user.email} (at least 8 characters). Share it with the customer.`,
+      suggested,
+    );
+    if (password === null) return;
+    if (password.length < 8) {
+      toast.error("Password must be at least 8 characters");
+      return;
+    }
+    setBusyId(user.id);
+    try {
+      await setUserPassword({ data: { userId: user.id, password } });
+      toast.success("Temporary password set. Share it with the customer.");
+    } catch (e) {
+      toast.error(e instanceof Error ? e.message : "Could not set password");
+    }
+    setBusyId(null);
+  }
+
   async function removeUser(user: AdminUser) {
+    if (!requireWrite()) return;
     if (!window.confirm(`Delete ${user.email}? This cannot be undone.`)) return;
     setBusyId(user.id);
     try {
@@ -96,7 +130,7 @@ function UsersPage() {
                 <tr key={u.id} className="border-t border-border">
                   <td className="px-4 py-3 text-ink">{u.email}</td>
                   <td className="px-4 py-3 text-muted-foreground">
-                    {u.confirmed ? "Confirmed" : "Pending confirmation"}
+                    {u.isGuest ? "Guest" : u.confirmed ? "Confirmed" : "Pending confirmation"}
                   </td>
                   <td className="px-4 py-3">
                     <span
@@ -104,7 +138,7 @@ function UsersPage() {
                         u.isAdmin ? "bg-primary text-primary-foreground" : "bg-surface text-ink"
                       }`}
                     >
-                      {u.isAdmin ? "Admin" : "User"}
+                      {u.isAdmin ? "Admin" : u.isGuest ? "Guest" : "User"}
                     </span>
                   </td>
                   <td className="px-4 py-3 text-muted-foreground">
@@ -128,6 +162,17 @@ function UsersPage() {
                           </>
                         )}
                       </Button>
+                      {!u.isGuest ? (
+                        <Button
+                          variant="ghost"
+                          size="icon"
+                          disabled={busyId === u.id}
+                          onClick={() => changePassword(u)}
+                          aria-label={`Set temporary password for ${u.email}`}
+                        >
+                          <KeyRound className="size-4 text-ink" />
+                        </Button>
+                      ) : null}
                       <Button
                         variant="ghost"
                         size="icon"

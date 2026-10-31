@@ -19,6 +19,13 @@ import { Route as ShopRouteImport } from './routes/shop'
 import { Route as AuthenticatedAdminRouteRouteImport } from './routes/_authenticated/admin/route'
 import { Route as ProductIdRouteImport } from './routes/product.$id'
 import { Route as AuthenticatedAdminIndexRouteImport } from './routes/_authenticated/admin/index'
+import { Route as AuthenticatedAdminCategoriesRouteImport } from './routes/_authenticated/admin/categories'
+import { Route as AuthenticatedAdminLandingRouteImport } from './routes/_authenticated/admin/landing'
+import { Route as AuthenticatedAdminPopupRouteImport } from './routes/_authenticated/admin/popup'
+import { Route as AuthenticatedAdminProductsRouteImport } from './routes/_authenticated/admin/products'
+import { Route as AuthenticatedAdminReviewsRouteImport } from './routes/_authenticated/admin/reviews'
+import { Route as AuthenticatedAdminSettingsRouteImport } from './routes/_authenticated/admin/settings'
+import { Route as AuthenticatedAdminSetupRouteImport } from './routes/_authenticated/admin/setup'
 import { Route as AuthenticatedAdminUsersRouteImport } from './routes/_authenticated/admin/users'
 import { Route as ApiAuthGuestRouteImport } from './routes/api/auth/guest'
 import { Route as ApiAuthLoginRouteImport } from './routes/api/auth/login'
@@ -26,6 +33,8 @@ import { Route as ApiAuthLogoutRouteImport } from './routes/api/auth/logout'
 import { Route as ApiAuthRegisterRouteImport } from './routes/api/auth/register'
 import { Route as ApiAuthSessionRouteImport } from './routes/api/auth/session'
 import { Route as ApiAuthUpgradeRouteImport } from './routes/api/auth/upgrade'
+import { Route as AuthenticatedAdminOrdersIndexRouteImport } from './routes/_authenticated/admin/orders/index'
+import { Route as AuthenticatedAdminOrdersOrderIdRouteImport } from './routes/_authenticated/admin/orders/$orderId'
 import { Route as ApiAuthGoogleIndexRouteImport } from './routes/api/auth/google/index'
 import { Route as ApiAuthGoogleCallbackRouteImport } from './routes/api/auth/google/callback'
 
@@ -78,6 +87,46 @@ const AuthenticatedAdminIndexRoute = AuthenticatedAdminIndexRouteImport.update({
   path: '/',
   getParentRoute: () => AuthenticatedAdminRouteRoute,
 } as any)
+const AuthenticatedAdminCategoriesRoute =
+  AuthenticatedAdminCategoriesRouteImport.update({
+    id: '/categories',
+    path: '/categories',
+    getParentRoute: () => AuthenticatedAdminRouteRoute,
+  } as any)
+const AuthenticatedAdminLandingRoute =
+  AuthenticatedAdminLandingRouteImport.update({
+    id: '/landing',
+    path: '/landing',
+    getParentRoute: () => AuthenticatedAdminRouteRoute,
+  } as any)
+const AuthenticatedAdminPopupRoute = AuthenticatedAdminPopupRouteImport.update({
+  id: '/popup',
+  path: '/popup',
+  getParentRoute: () => AuthenticatedAdminRouteRoute,
+} as any)
+const AuthenticatedAdminProductsRoute =
+  AuthenticatedAdminProductsRouteImport.update({
+    id: '/products',
+    path: '/products',
+    getParentRoute: () => AuthenticatedAdminRouteRoute,
+  } as any)
+const AuthenticatedAdminReviewsRoute =
+  AuthenticatedAdminReviewsRouteImport.update({
+    id: '/reviews',
+    path: '/reviews',
+    getParentRoute: () => AuthenticatedAdminRouteRoute,
+  } as any)
+const AuthenticatedAdminSettingsRoute =
+  AuthenticatedAdminSettingsRouteImport.update({
+    id: '/settings',
+    path: '/settings',
+    getParentRoute: () => AuthenticatedAdminRouteRoute,
+  } as any)
+const AuthenticatedAdminSetupRoute = AuthenticatedAdminSetupRouteImport.update({
+  id: '/setup',
+  path: '/setup',
+  getParentRoute: () => AuthenticatedAdminRouteRoute,
+} as any)
 const AuthenticatedAdminUsersRoute = AuthenticatedAdminUsersRouteImport.update({
   id: '/users',
   path: '/users',
@@ -113,6 +162,18 @@ const ApiAuthUpgradeRoute = ApiAuthUpgradeRouteImport.update({
   path: '/api/auth/upgrade',
   getParentRoute: () => rootRouteImport,
 } as any)
+const AuthenticatedAdminOrdersIndexRoute =
+  AuthenticatedAdminOrdersIndexRouteImport.update({
+    id: '/orders/',
+    path: '/orders/',
+    getParentRoute: () => AuthenticatedAdminRouteRoute,
+  } as any)
+const AuthenticatedAdminOrdersOrderIdRoute =
+  AuthenticatedAdminOrdersOrderIdRouteImport.update({
+    id: '/orders/$orderId',
+    path: '/orders/$orderId',
+    getParentRoute: () => AuthenticatedAdminRouteRoute,
+  } as any)
 const ApiAuthGoogleIndexRoute = ApiAuthGoogleIndexRouteImport.update({
   id: '/api/auth/google/',
   path: '/api/auth/google/',
@@ -133,6 +194,13 @@ export interface FileRoutesByFullPath {
   '/shop': typeof ShopRoute
   '/admin': typeof AuthenticatedAdminRouteRouteWithChildren
   '/product/$id': typeof ProductIdRoute
+  '/admin/categories': typeof AuthenticatedAdminCategoriesRoute
+  '/admin/landing': typeof AuthenticatedAdminLandingRoute
+  '/admin/popup': typeof AuthenticatedAdminPopupRoute
+  '/admin/products': typeof AuthenticatedAdminProductsRoute
+  '/admin/reviews': typeof AuthenticatedAdminReviewsRoute
+  '/admin/settings': typeof AuthenticatedAdminSettingsRoute
+  '/admin/setup': typeof AuthenticatedAdminSetupRoute
   '/admin/users': typeof AuthenticatedAdminUsersRoute
   '/api/auth/guest': typeof ApiAuthGuestRoute
   '/api/auth/login': typeof ApiAuthLoginRoute
@@ -141,7 +209,9 @@ export interface FileRoutesByFullPath {
   '/api/auth/session': typeof ApiAuthSessionRoute
   '/api/auth/upgrade': typeof ApiAuthUpgradeRoute
   '/admin/': typeof AuthenticatedAdminIndexRoute
+  '/admin/orders/$orderId': typeof AuthenticatedAdminOrdersOrderIdRoute
   '/api/auth/google/callback': typeof ApiAuthGoogleCallbackRoute
+  '/admin/orders/': typeof AuthenticatedAdminOrdersIndexRoute
   '/api/auth/google/': typeof ApiAuthGoogleIndexRoute
 }
 export interface FileRoutesByTo {
@@ -152,6 +222,13 @@ export interface FileRoutesByTo {
   '/checkout': typeof CheckoutRoute
   '/shop': typeof ShopRoute
   '/product/$id': typeof ProductIdRoute
+  '/admin/categories': typeof AuthenticatedAdminCategoriesRoute
+  '/admin/landing': typeof AuthenticatedAdminLandingRoute
+  '/admin/popup': typeof AuthenticatedAdminPopupRoute
+  '/admin/products': typeof AuthenticatedAdminProductsRoute
+  '/admin/reviews': typeof AuthenticatedAdminReviewsRoute
+  '/admin/settings': typeof AuthenticatedAdminSettingsRoute
+  '/admin/setup': typeof AuthenticatedAdminSetupRoute
   '/admin/users': typeof AuthenticatedAdminUsersRoute
   '/api/auth/guest': typeof ApiAuthGuestRoute
   '/api/auth/login': typeof ApiAuthLoginRoute
@@ -160,7 +237,9 @@ export interface FileRoutesByTo {
   '/api/auth/session': typeof ApiAuthSessionRoute
   '/api/auth/upgrade': typeof ApiAuthUpgradeRoute
   '/admin': typeof AuthenticatedAdminIndexRoute
+  '/admin/orders/$orderId': typeof AuthenticatedAdminOrdersOrderIdRoute
   '/api/auth/google/callback': typeof ApiAuthGoogleCallbackRoute
+  '/admin/orders': typeof AuthenticatedAdminOrdersIndexRoute
   '/api/auth/google': typeof ApiAuthGoogleIndexRoute
 }
 export interface FileRoutesById {
@@ -174,6 +253,13 @@ export interface FileRoutesById {
   '/shop': typeof ShopRoute
   '/_authenticated/admin': typeof AuthenticatedAdminRouteRouteWithChildren
   '/product/$id': typeof ProductIdRoute
+  '/_authenticated/admin/categories': typeof AuthenticatedAdminCategoriesRoute
+  '/_authenticated/admin/landing': typeof AuthenticatedAdminLandingRoute
+  '/_authenticated/admin/popup': typeof AuthenticatedAdminPopupRoute
+  '/_authenticated/admin/products': typeof AuthenticatedAdminProductsRoute
+  '/_authenticated/admin/reviews': typeof AuthenticatedAdminReviewsRoute
+  '/_authenticated/admin/settings': typeof AuthenticatedAdminSettingsRoute
+  '/_authenticated/admin/setup': typeof AuthenticatedAdminSetupRoute
   '/_authenticated/admin/users': typeof AuthenticatedAdminUsersRoute
   '/api/auth/guest': typeof ApiAuthGuestRoute
   '/api/auth/login': typeof ApiAuthLoginRoute
@@ -182,7 +268,9 @@ export interface FileRoutesById {
   '/api/auth/session': typeof ApiAuthSessionRoute
   '/api/auth/upgrade': typeof ApiAuthUpgradeRoute
   '/_authenticated/admin/': typeof AuthenticatedAdminIndexRoute
+  '/_authenticated/admin/orders/$orderId': typeof AuthenticatedAdminOrdersOrderIdRoute
   '/api/auth/google/callback': typeof ApiAuthGoogleCallbackRoute
+  '/_authenticated/admin/orders/': typeof AuthenticatedAdminOrdersIndexRoute
   '/api/auth/google/': typeof ApiAuthGoogleIndexRoute
 }
 export interface FileRouteTypes {
@@ -196,6 +284,13 @@ export interface FileRouteTypes {
     | '/shop'
     | '/admin'
     | '/product/$id'
+    | '/admin/categories'
+    | '/admin/landing'
+    | '/admin/popup'
+    | '/admin/products'
+    | '/admin/reviews'
+    | '/admin/settings'
+    | '/admin/setup'
     | '/admin/users'
     | '/api/auth/guest'
     | '/api/auth/login'
@@ -204,7 +299,9 @@ export interface FileRouteTypes {
     | '/api/auth/session'
     | '/api/auth/upgrade'
     | '/admin/'
+    | '/admin/orders/$orderId'
     | '/api/auth/google/callback'
+    | '/admin/orders/'
     | '/api/auth/google/'
   fileRoutesByTo: FileRoutesByTo
   to:
@@ -215,6 +312,13 @@ export interface FileRouteTypes {
     | '/checkout'
     | '/shop'
     | '/product/$id'
+    | '/admin/categories'
+    | '/admin/landing'
+    | '/admin/popup'
+    | '/admin/products'
+    | '/admin/reviews'
+    | '/admin/settings'
+    | '/admin/setup'
     | '/admin/users'
     | '/api/auth/guest'
     | '/api/auth/login'
@@ -223,7 +327,9 @@ export interface FileRouteTypes {
     | '/api/auth/session'
     | '/api/auth/upgrade'
     | '/admin'
+    | '/admin/orders/$orderId'
     | '/api/auth/google/callback'
+    | '/admin/orders'
     | '/api/auth/google'
   id:
     | '__root__'
@@ -236,6 +342,13 @@ export interface FileRouteTypes {
     | '/shop'
     | '/_authenticated/admin'
     | '/product/$id'
+    | '/_authenticated/admin/categories'
+    | '/_authenticated/admin/landing'
+    | '/_authenticated/admin/popup'
+    | '/_authenticated/admin/products'
+    | '/_authenticated/admin/reviews'
+    | '/_authenticated/admin/settings'
+    | '/_authenticated/admin/setup'
     | '/_authenticated/admin/users'
     | '/api/auth/guest'
     | '/api/auth/login'
@@ -244,7 +357,9 @@ export interface FileRouteTypes {
     | '/api/auth/session'
     | '/api/auth/upgrade'
     | '/_authenticated/admin/'
+    | '/_authenticated/admin/orders/$orderId'
     | '/api/auth/google/callback'
+    | '/_authenticated/admin/orders/'
     | '/api/auth/google/'
   fileRoutesById: FileRoutesById
 }
@@ -339,6 +454,55 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedAdminIndexRouteImport
       parentRoute: typeof AuthenticatedAdminRouteRoute
     }
+    '/_authenticated/admin/categories': {
+      id: '/_authenticated/admin/categories'
+      path: '/categories'
+      fullPath: '/admin/categories'
+      preLoaderRoute: typeof AuthenticatedAdminCategoriesRouteImport
+      parentRoute: typeof AuthenticatedAdminRouteRoute
+    }
+    '/_authenticated/admin/landing': {
+      id: '/_authenticated/admin/landing'
+      path: '/landing'
+      fullPath: '/admin/landing'
+      preLoaderRoute: typeof AuthenticatedAdminLandingRouteImport
+      parentRoute: typeof AuthenticatedAdminRouteRoute
+    }
+    '/_authenticated/admin/popup': {
+      id: '/_authenticated/admin/popup'
+      path: '/popup'
+      fullPath: '/admin/popup'
+      preLoaderRoute: typeof AuthenticatedAdminPopupRouteImport
+      parentRoute: typeof AuthenticatedAdminRouteRoute
+    }
+    '/_authenticated/admin/products': {
+      id: '/_authenticated/admin/products'
+      path: '/products'
+      fullPath: '/admin/products'
+      preLoaderRoute: typeof AuthenticatedAdminProductsRouteImport
+      parentRoute: typeof AuthenticatedAdminRouteRoute
+    }
+    '/_authenticated/admin/reviews': {
+      id: '/_authenticated/admin/reviews'
+      path: '/reviews'
+      fullPath: '/admin/reviews'
+      preLoaderRoute: typeof AuthenticatedAdminReviewsRouteImport
+      parentRoute: typeof AuthenticatedAdminRouteRoute
+    }
+    '/_authenticated/admin/settings': {
+      id: '/_authenticated/admin/settings'
+      path: '/settings'
+      fullPath: '/admin/settings'
+      preLoaderRoute: typeof AuthenticatedAdminSettingsRouteImport
+      parentRoute: typeof AuthenticatedAdminRouteRoute
+    }
+    '/_authenticated/admin/setup': {
+      id: '/_authenticated/admin/setup'
+      path: '/setup'
+      fullPath: '/admin/setup'
+      preLoaderRoute: typeof AuthenticatedAdminSetupRouteImport
+      parentRoute: typeof AuthenticatedAdminRouteRoute
+    }
     '/_authenticated/admin/users': {
       id: '/_authenticated/admin/users'
       path: '/users'
@@ -388,6 +552,20 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ApiAuthUpgradeRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/_authenticated/admin/orders/': {
+      id: '/_authenticated/admin/orders/'
+      path: '/orders'
+      fullPath: '/admin/orders/'
+      preLoaderRoute: typeof AuthenticatedAdminOrdersIndexRouteImport
+      parentRoute: typeof AuthenticatedAdminRouteRoute
+    }
+    '/_authenticated/admin/orders/$orderId': {
+      id: '/_authenticated/admin/orders/$orderId'
+      path: '/orders/$orderId'
+      fullPath: '/admin/orders/$orderId'
+      preLoaderRoute: typeof AuthenticatedAdminOrdersOrderIdRouteImport
+      parentRoute: typeof AuthenticatedAdminRouteRoute
+    }
     '/api/auth/google/': {
       id: '/api/auth/google/'
       path: '/api/auth/google'
@@ -406,14 +584,32 @@ declare module '@tanstack/react-router' {
 }
 
 interface AuthenticatedAdminRouteRouteChildren {
+  AuthenticatedAdminCategoriesRoute: typeof AuthenticatedAdminCategoriesRoute
+  AuthenticatedAdminLandingRoute: typeof AuthenticatedAdminLandingRoute
+  AuthenticatedAdminPopupRoute: typeof AuthenticatedAdminPopupRoute
+  AuthenticatedAdminProductsRoute: typeof AuthenticatedAdminProductsRoute
+  AuthenticatedAdminReviewsRoute: typeof AuthenticatedAdminReviewsRoute
+  AuthenticatedAdminSettingsRoute: typeof AuthenticatedAdminSettingsRoute
+  AuthenticatedAdminSetupRoute: typeof AuthenticatedAdminSetupRoute
   AuthenticatedAdminUsersRoute: typeof AuthenticatedAdminUsersRoute
   AuthenticatedAdminIndexRoute: typeof AuthenticatedAdminIndexRoute
+  AuthenticatedAdminOrdersOrderIdRoute: typeof AuthenticatedAdminOrdersOrderIdRoute
+  AuthenticatedAdminOrdersIndexRoute: typeof AuthenticatedAdminOrdersIndexRoute
 }
 
 const AuthenticatedAdminRouteRouteChildren: AuthenticatedAdminRouteRouteChildren =
   {
+    AuthenticatedAdminCategoriesRoute: AuthenticatedAdminCategoriesRoute,
+    AuthenticatedAdminLandingRoute: AuthenticatedAdminLandingRoute,
+    AuthenticatedAdminPopupRoute: AuthenticatedAdminPopupRoute,
+    AuthenticatedAdminProductsRoute: AuthenticatedAdminProductsRoute,
+    AuthenticatedAdminReviewsRoute: AuthenticatedAdminReviewsRoute,
+    AuthenticatedAdminSettingsRoute: AuthenticatedAdminSettingsRoute,
+    AuthenticatedAdminSetupRoute: AuthenticatedAdminSetupRoute,
     AuthenticatedAdminUsersRoute: AuthenticatedAdminUsersRoute,
     AuthenticatedAdminIndexRoute: AuthenticatedAdminIndexRoute,
+    AuthenticatedAdminOrdersOrderIdRoute: AuthenticatedAdminOrdersOrderIdRoute,
+    AuthenticatedAdminOrdersIndexRoute: AuthenticatedAdminOrdersIndexRoute,
   }
 
 const AuthenticatedAdminRouteRouteWithChildren =

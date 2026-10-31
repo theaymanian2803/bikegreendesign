@@ -1,461 +1,282 @@
-import { useEffect, useMemo, useState } from "react";
-import { createFileRoute } from "@tanstack/react-router";
-import { Plus, Save, Trash2 } from "lucide-react";
+import { useEffect, useState } from "react";
+import { createFileRoute, Link } from "@tanstack/react-router";
+import {
+  ArrowRight,
+  CircleDollarSign,
+  Package,
+  ShoppingCart,
+  TrendingUp,
+  Trophy,
+} from "lucide-react";
+import { Bar, BarChart, CartesianGrid, ResponsiveContainer, Tooltip, XAxis, YAxis } from "recharts";
 import { toast } from "sonner";
 
-import { supabase } from "@/integrations/supabase/client";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
+import { getDashboardStats, type DashboardStats } from "@/lib/dashboard.functions";
+import { ORDER_STATUSES, type OrderStatus } from "@/lib/orders.functions";
+import { formatMoney } from "@/lib/money";
+import { StatusBadge } from "@/components/admin/order-status";
 
 export const Route = createFileRoute("/_authenticated/admin/")({
   head: () => ({
     meta: [
-      { title: "Mega Menu Admin — Pathway" },
+      { title: "Dashboard — Pathway Admin" },
       {
         name: "description",
-        content:
-          "Manage Pathway's mega menu: categories, featured products, images, labels and link targets.",
+        content: "Store performance overview: orders, revenue and top products.",
       },
-      { property: "og:title", content: "Mega Menu Admin — Pathway" },
-      {
-        property: "og:description",
-        content: "Edit mega menu categories, products, images and links.",
-      },
+      { property: "og:title", content: "Dashboard — Pathway Admin" },
+      { property: "og:description", content: "Pathway store performance at a glance." },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary" },
       { name: "robots", content: "noindex" },
     ],
   }),
-  component: AdminPage,
+  component: DashboardPage,
 });
 
-type MenuRow = {
-  key: string;
-  title: string;
-  categories_title: string;
-  products_title: string;
-  left_banner_image: string | null;
-  left_banner_alt: string | null;
-  right_banner_image: string | null;
-  right_banner_alt: string | null;
-  sort_order: number;
-};
-
-type CategoryRow = {
-  id: string;
-  menu_key: string;
-  label: string;
-  image_url: string;
-  href: string;
-  sort_order: number;
-};
-
-type ProductRow = {
-  id: string;
-  menu_key: string;
-  name: string;
-  price: number;
-  old_price: number | null;
-  badge: string | null;
-  image_url: string;
-  href: string;
-  sort_order: number;
-};
-
-function Field({
+function StatCard({
+  icon,
   label,
   value,
-  onChange,
-  placeholder,
+  hint,
 }: {
+  icon: React.ReactNode;
   label: string;
   value: string;
-  onChange: (v: string) => void;
-  placeholder?: string;
+  hint: string;
 }) {
   return (
-    <div className="space-y-1.5">
-      <Label className="text-xs uppercase tracking-wide text-muted-foreground">{label}</Label>
-      <Input value={value} placeholder={placeholder} onChange={(e) => onChange(e.target.value)} />
+    <div className="rounded-lg border border-border p-5">
+      <div className="flex items-center justify-between">
+        <span className="font-sans text-xs font-bold uppercase tracking-wide text-muted-foreground">
+          {label}
+        </span>
+        <span className="text-ink">{icon}</span>
+      </div>
+      <p className="mt-3 font-display text-3xl font-bold text-ink">{value}</p>
+      <p className="mt-1 font-sans text-xs text-muted-foreground">{hint}</p>
     </div>
   );
 }
 
-function Thumb({ src }: { src: string }) {
-  if (!src) return <span className="size-14 shrink-0 rounded bg-surface" />;
-  return (
-    <img
-      src={src}
-      alt=""
-      className="size-14 shrink-0 rounded object-cover"
-      loading="lazy"
-      width={112}
-      height={112}
-    />
-  );
-}
+function DashboardPage() {
+  const [stats, setStats] = useState<DashboardStats | null>(null);
 
-function AdminPage() {
-  const [menus, setMenus] = useState<MenuRow[]>([]);
-  const [activeKey, setActiveKey] = useState<string>("");
-  const [categories, setCategories] = useState<CategoryRow[]>([]);
-  const [products, setProducts] = useState<ProductRow[]>([]);
-  const [loading, setLoading] = useState(true);
-  const [saving, setSaving] = useState(false);
-
-  const menu = useMemo(() => menus.find((m) => m.key === activeKey), [menus, activeKey]);
-
-
+  async function load() {
+    try {
+      setStats(await getDashboardStats());
+    } catch (e) {
+      toast.error(e instanceof Error ? e.message : "Could not load dashboard");
+    }
+  }
 
   useEffect(() => {
-    (async () => {
-      const { data, error } = await supabase
-        .from("mega_menus")
-        .select("*")
-        .order("sort_order", { ascending: true });
-      if (error) toast.error(error.message);
-      const rows = (data ?? []) as MenuRow[];
-      setMenus(rows);
-      setActiveKey((k) => k || rows[0]?.key || "");
-      setLoading(false);
-    })();
+    void load();
   }, []);
 
-  useEffect(() => {
-    if (!activeKey) return;
-    (async () => {
-      const [c, p] = await Promise.all([
-        supabase
-          .from("mega_menu_categories")
-          .select("*")
-          .eq("menu_key", activeKey)
-          .order("sort_order", { ascending: true }),
-        supabase
-          .from("mega_menu_products")
-          .select("*")
-          .eq("menu_key", activeKey)
-          .order("sort_order", { ascending: true }),
-      ]);
-      if (c.error) toast.error(c.error.message);
-      if (p.error) toast.error(p.error.message);
-      setCategories((c.data ?? []) as CategoryRow[]);
-      setProducts(((p.data ?? []) as ProductRow[]).map((r) => ({ ...r, price: Number(r.price) })));
-    })();
-  }, [activeKey]);
-
-  function patchMenu(patch: Partial<MenuRow>) {
-    setMenus((prev) => prev.map((m) => (m.key === activeKey ? { ...m, ...patch } : m)));
-  }
-
-  async function saveAll() {
-    if (!menu) return;
-    setSaving(true);
-    const { error: menuErr } = await supabase
-      .from("mega_menus")
-      .update({
-        title: menu.title,
-        categories_title: menu.categories_title,
-        products_title: menu.products_title,
-        left_banner_image: menu.left_banner_image,
-        left_banner_alt: menu.left_banner_alt,
-        right_banner_image: menu.right_banner_image,
-        right_banner_alt: menu.right_banner_alt,
-      })
-      .eq("key", menu.key);
-
-    const catErr = categories.length
-      ? (
-          await supabase.from("mega_menu_categories").upsert(
-            categories.map((c, i) => ({
-              id: c.id,
-              menu_key: c.menu_key,
-              label: c.label,
-              image_url: c.image_url,
-              href: c.href,
-              sort_order: i + 1,
-            })),
-          )
-        ).error
-      : null;
-
-    const prodErr = products.length
-      ? (
-          await supabase.from("mega_menu_products").upsert(
-            products.map((p, i) => ({
-              id: p.id,
-              menu_key: p.menu_key,
-              name: p.name,
-              price: p.price,
-              old_price: p.old_price,
-              badge: p.badge,
-              image_url: p.image_url,
-              href: p.href,
-              sort_order: i + 1,
-            })),
-          )
-        ).error
-      : null;
-
-    setSaving(false);
-    const err = menuErr || catErr || prodErr;
-    if (err) toast.error(err.message);
-    else toast.success("Mega menu saved");
-  }
-
-  async function addCategory() {
-    const { data, error } = await supabase
-      .from("mega_menu_categories")
-      .insert({
-        menu_key: activeKey,
-        label: "New category",
-        image_url: "/menu/p-helmet-red.jpg",
-        href: "/shop",
-        sort_order: categories.length + 1,
-      })
-      .select()
-      .single();
-    if (error) return toast.error(error.message);
-    setCategories((prev) => [...prev, data as CategoryRow]);
-  }
-
-  async function addProduct() {
-    const { data, error } = await supabase
-      .from("mega_menu_products")
-      .insert({
-        menu_key: activeKey,
-        name: "New product",
-        price: 0,
-        image_url: "/menu/p-stem.jpg",
-        href: "/shop",
-        sort_order: products.length + 1,
-      })
-      .select()
-      .single();
-    if (error) return toast.error(error.message);
-    setProducts((prev) => [...prev, { ...(data as ProductRow), price: Number(data.price) }]);
-  }
-
-  async function removeCategory(id: string) {
-    const { error } = await supabase.from("mega_menu_categories").delete().eq("id", id);
-    if (error) return toast.error(error.message);
-    setCategories((prev) => prev.filter((c) => c.id !== id));
-  }
-
-  async function removeProduct(id: string) {
-    const { error } = await supabase.from("mega_menu_products").delete().eq("id", id);
-    if (error) return toast.error(error.message);
-    setProducts((prev) => prev.filter((p) => p.id !== id));
-  }
-
-  if (loading) {
+  if (!stats) {
     return <div className="py-20 font-sans text-muted-foreground">Loading…</div>;
   }
 
+  const chartData = stats.revenueSeries.map((point) => ({
+    day: point.day.slice(5),
+    revenue: point.revenueCents / 100,
+  }));
+
   return (
     <main className="py-8">
-      <header className="flex flex-wrap items-end justify-between gap-4">
-        <div>
-          <p className="section-label">Admin</p>
-          <h1 className="font-display text-3xl font-bold text-ink">Mega menu content</h1>
-          <p className="mt-1 font-sans text-sm text-muted-foreground">
-            Images, labels and link targets for every dropdown in the main navigation.
-          </p>
-        </div>
-        <Button onClick={saveAll} disabled={saving} className="btn-brand">
-          <Save className="mr-2 size-4" />
-          {saving ? "Saving…" : "Save changes"}
-        </Button>
+      <header>
+        <p className="section-label">Admin</p>
+        <h1 className="font-display text-3xl font-bold text-ink">Dashboard</h1>
+        <p className="mt-1 font-sans text-sm text-muted-foreground">
+          Store performance overview for today.
+        </p>
       </header>
 
-
-
-      <div className="mt-8 flex flex-wrap gap-2">
-        {menus.map((m) => (
-          <button
-            key={m.key}
-            onClick={() => setActiveKey(m.key)}
-            className={`rounded-full px-4 py-2 font-sans text-sm transition-colors ${
-              m.key === activeKey
-                ? "bg-primary text-primary-foreground"
-                : "bg-surface text-ink hover:bg-surface/70"
-            }`}
-          >
-            {m.title}
-          </button>
-        ))}
+      <div className="mt-6 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+        <StatCard
+          icon={<Package className="size-5" />}
+          label="Total orders"
+          value={String(stats.totalOrders)}
+          hint={`${stats.todayOrders} today`}
+        />
+        <StatCard
+          icon={<CircleDollarSign className="size-5" />}
+          label="Revenue"
+          value={formatMoney(stats.totalRevenueCents)}
+          hint={`${formatMoney(stats.todayRevenueCents)} today`}
+        />
+        <StatCard
+          icon={<ShoppingCart className="size-5" />}
+          label="Avg. order"
+          value={formatMoney(stats.avgOrderCents)}
+          hint="Excluding cancelled"
+        />
+        <StatCard
+          icon={<TrendingUp className="size-5" />}
+          label="In progress"
+          value={String(stats.statusCounts.new + stats.statusCounts.processing)}
+          hint="New + processing"
+        />
       </div>
 
-      {menu ? (
-        <div className="mt-8 space-y-10">
-          <section className="rounded-lg border border-border p-6">
-            <h2 className="font-display text-lg font-bold text-ink">Menu settings</h2>
-            <div className="mt-4 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-              <Field label="Nav label" value={menu.title} onChange={(v) => patchMenu({ title: v })} />
-              <Field
-                label="Categories heading"
-                value={menu.categories_title}
-                onChange={(v) => patchMenu({ categories_title: v })}
-              />
-              <Field
-                label="Products heading"
-                value={menu.products_title}
-                onChange={(v) => patchMenu({ products_title: v })}
-              />
-              <Field
-                label="Left banner image URL"
-                value={menu.left_banner_image ?? ""}
-                onChange={(v) => patchMenu({ left_banner_image: v })}
-              />
-              <Field
-                label="Left banner alt"
-                value={menu.left_banner_alt ?? ""}
-                onChange={(v) => patchMenu({ left_banner_alt: v })}
-              />
-              <Field
-                label="Right banner image URL"
-                value={menu.right_banner_image ?? ""}
-                onChange={(v) => patchMenu({ right_banner_image: v })}
-              />
-              <Field
-                label="Right banner alt"
-                value={menu.right_banner_alt ?? ""}
-                onChange={(v) => patchMenu({ right_banner_alt: v })}
-              />
-            </div>
-          </section>
+      <div className="mt-6 grid gap-6 lg:grid-cols-[1fr_340px]">
+        <section className="rounded-lg border border-border p-6">
+          <div className="flex items-center justify-between">
+            <h2 className="font-display text-lg font-bold text-ink">Revenue — last 7 days</h2>
+            <Link
+              to="/admin/orders"
+              className="flex items-center gap-1 font-sans text-xs font-bold uppercase tracking-wide text-primary"
+            >
+              View orders <ArrowRight className="size-3.5" />
+            </Link>
+          </div>
+          <div className="mt-4 h-64">
+            <ResponsiveContainer width="100%" height="100%">
+              <BarChart data={chartData} margin={{ top: 4, right: 4, left: -12, bottom: 0 }}>
+                <CartesianGrid
+                  strokeDasharray="3 3"
+                  stroke="var(--color-border)"
+                  vertical={false}
+                />
+                <XAxis
+                  dataKey="day"
+                  tick={{ fontSize: 11, fill: "var(--color-muted-foreground)" }}
+                  axisLine={false}
+                  tickLine={false}
+                />
+                <YAxis
+                  tick={{ fontSize: 11, fill: "var(--color-muted-foreground)" }}
+                  axisLine={false}
+                  tickLine={false}
+                />
+                <Tooltip
+                  cursor={{ fill: "var(--color-surface)" }}
+                  formatter={(value) => [formatMoney(Number(value) * 100), "Revenue"]}
+                  contentStyle={{
+                    fontSize: 12,
+                    borderRadius: 8,
+                    border: "1px solid var(--color-border)",
+                  }}
+                />
+                <Bar
+                  dataKey="revenue"
+                  fill="var(--color-primary)"
+                  radius={[4, 4, 0, 0]}
+                  maxBarSize={42}
+                />
+              </BarChart>
+            </ResponsiveContainer>
+          </div>
+        </section>
 
-          <section className="rounded-lg border border-border p-6">
-            <div className="flex items-center justify-between">
-              <h2 className="font-display text-lg font-bold text-ink">
-                Categories ({categories.length})
-              </h2>
-              <Button variant="outline" onClick={addCategory}>
-                <Plus className="mr-2 size-4" /> Add category
-              </Button>
-            </div>
-            <div className="mt-4 space-y-4">
-              {categories.map((c, i) => (
-                <div key={c.id} className="flex flex-wrap items-start gap-4 rounded border border-border p-4">
-                  <Thumb src={c.image_url} />
-                  <div className="grid min-w-0 flex-1 gap-3 sm:grid-cols-3">
-                    <Field
-                      label="Label"
-                      value={c.label}
-                      onChange={(v) =>
-                        setCategories((prev) =>
-                          prev.map((x, xi) => (xi === i ? { ...x, label: v } : x)),
-                        )
-                      }
-                    />
-                    <Field
-                      label="Image URL"
-                      value={c.image_url}
-                      placeholder="/menu/p-helmet-red.jpg"
-                      onChange={(v) =>
-                        setCategories((prev) =>
-                          prev.map((x, xi) => (xi === i ? { ...x, image_url: v } : x)),
-                        )
-                      }
-                    />
-                    <Field
-                      label="Link target"
-                      value={c.href}
-                      placeholder="/shop"
-                      onChange={(v) =>
-                        setCategories((prev) =>
-                          prev.map((x, xi) => (xi === i ? { ...x, href: v } : x)),
-                        )
-                      }
+        <section className="rounded-lg border border-border p-6">
+          <h2 className="font-display text-lg font-bold text-ink">Orders by status</h2>
+          <ul className="mt-4 space-y-3">
+            {ORDER_STATUSES.map((status: OrderStatus) => {
+              const count = stats.statusCounts[status];
+              const total = Math.max(stats.totalOrders, 1);
+              const width = Math.round((count / total) * 100);
+              return (
+                <li key={status}>
+                  <div className="flex items-center justify-between font-sans text-xs">
+                    <span className="text-muted-foreground">{status}</span>
+                    <span className="font-semibold text-ink">{count}</span>
+                  </div>
+                  <div className="mt-1.5 h-1.5 rounded-full bg-surface">
+                    <div
+                      className="h-1.5 rounded-full bg-primary"
+                      style={{ width: `${Math.min(width, 100)}%` }}
                     />
                   </div>
-                  <Button variant="ghost" size="icon" onClick={() => removeCategory(c.id)}>
-                    <Trash2 className="size-4 text-primary" />
-                  </Button>
-                </div>
-              ))}
-            </div>
-          </section>
+                </li>
+              );
+            })}
+          </ul>
+        </section>
+      </div>
 
-          <section className="rounded-lg border border-border p-6">
-            <div className="flex items-center justify-between">
-              <h2 className="font-display text-lg font-bold text-ink">
-                Featured products ({products.length})
-              </h2>
-              <Button variant="outline" onClick={addProduct}>
-                <Plus className="mr-2 size-4" /> Add product
-              </Button>
+      <div className="mt-6 grid gap-6 lg:grid-cols-[1fr_340px]">
+        <section className="rounded-lg border border-border">
+          <div className="flex items-center justify-between px-6 pt-6">
+            <h2 className="font-display text-lg font-bold text-ink">Recent orders</h2>
+            <Link
+              to="/admin/orders"
+              className="flex items-center gap-1 font-sans text-xs font-bold uppercase tracking-wide text-primary"
+            >
+              All orders <ArrowRight className="size-3.5" />
+            </Link>
+          </div>
+          {stats.recentOrders.length === 0 ? (
+            <p className="px-6 pb-6 pt-4 font-sans text-sm text-muted-foreground">
+              No orders yet. Orders placed at checkout will show up here.
+            </p>
+          ) : (
+            <div className="mt-3 overflow-x-auto">
+              <table className="w-full min-w-[560px] font-sans text-sm">
+                <thead className="bg-surface text-left text-xs uppercase tracking-wide text-muted-foreground">
+                  <tr>
+                    <th className="px-6 py-3">Order</th>
+                    <th className="px-6 py-3">Customer</th>
+                    <th className="px-6 py-3">Total</th>
+                    <th className="px-6 py-3">Status</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {stats.recentOrders.map((o) => (
+                    <tr key={o.id} className="border-t border-border">
+                      <td className="px-6 py-3">
+                        <Link
+                          to="/admin/orders/$orderId"
+                          params={{ orderId: String(o.id) }}
+                          className="font-semibold text-primary hover:underline"
+                        >
+                          {o.publicId}
+                        </Link>
+                      </td>
+                      <td className="px-6 py-3">
+                        <span className="block text-ink">{o.fullName}</span>
+                        <span className="block text-xs text-muted-foreground">{o.email}</span>
+                      </td>
+                      <td className="px-6 py-3 font-semibold text-ink">
+                        {formatMoney(o.totalCents)}
+                      </td>
+                      <td className="px-6 py-3">
+                        <StatusBadge status={o.status} />
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
             </div>
-            <div className="mt-4 space-y-4">
-              {products.map((p, i) => (
-                <div key={p.id} className="flex flex-wrap items-start gap-4 rounded border border-border p-4">
-                  <Thumb src={p.image_url} />
-                  <div className="grid min-w-0 flex-1 gap-3 sm:grid-cols-3">
-                    <Field
-                      label="Name"
-                      value={p.name}
-                      onChange={(v) =>
-                        setProducts((prev) => prev.map((x, xi) => (xi === i ? { ...x, name: v } : x)))
-                      }
-                    />
-                    <Field
-                      label="Price"
-                      value={String(p.price)}
-                      onChange={(v) =>
-                        setProducts((prev) =>
-                          prev.map((x, xi) => (xi === i ? { ...x, price: Number(v) || 0 } : x)),
-                        )
-                      }
-                    />
-                    <Field
-                      label="Old price"
-                      value={p.old_price === null ? "" : String(p.old_price)}
-                      onChange={(v) =>
-                        setProducts((prev) =>
-                          prev.map((x, xi) =>
-                            xi === i ? { ...x, old_price: v === "" ? null : Number(v) || 0 } : x,
-                          ),
-                        )
-                      }
-                    />
-                    <Field
-                      label="Badge"
-                      value={p.badge ?? ""}
-                      placeholder="-10%"
-                      onChange={(v) =>
-                        setProducts((prev) =>
-                          prev.map((x, xi) => (xi === i ? { ...x, badge: v === "" ? null : v } : x)),
-                        )
-                      }
-                    />
-                    <Field
-                      label="Image URL"
-                      value={p.image_url}
-                      placeholder="/menu/p-stem.jpg"
-                      onChange={(v) =>
-                        setProducts((prev) =>
-                          prev.map((x, xi) => (xi === i ? { ...x, image_url: v } : x)),
-                        )
-                      }
-                    />
-                    <Field
-                      label="Link target"
-                      value={p.href}
-                      placeholder="/shop"
-                      onChange={(v) =>
-                        setProducts((prev) => prev.map((x, xi) => (xi === i ? { ...x, href: v } : x)))
-                      }
-                    />
+          )}
+        </section>
+
+        <section className="rounded-lg border border-border p-6">
+          <h2 className="flex items-center gap-2 font-display text-lg font-bold text-ink">
+            <Trophy className="size-4 text-primary" /> Top products
+          </h2>
+          {stats.topProducts.length === 0 ? (
+            <p className="mt-4 font-sans text-sm text-muted-foreground">No product sales yet.</p>
+          ) : (
+            <ol className="mt-4 space-y-4">
+              {stats.topProducts.map((p, i) => (
+                <li key={p.name} className="flex items-start gap-3">
+                  <span className="mt-0.5 font-display text-sm font-bold text-muted-foreground">
+                    {i + 1}
+                  </span>
+                  <div className="min-w-0 flex-1">
+                    <p className="truncate font-sans text-sm text-ink">{p.name}</p>
+                    <p className="font-sans text-xs text-muted-foreground">
+                      {p.qty} sold · {formatMoney(p.revenueCents)}
+                    </p>
                   </div>
-                  <Button variant="ghost" size="icon" onClick={() => removeProduct(p.id)}>
-                    <Trash2 className="size-4 text-primary" />
-                  </Button>
-                </div>
+                </li>
               ))}
-            </div>
-          </section>
-        </div>
-      ) : null}
+            </ol>
+          )}
+        </section>
+      </div>
     </main>
   );
 }
