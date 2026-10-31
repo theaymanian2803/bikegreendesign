@@ -31,7 +31,9 @@ Other scripts: `bun run build`, `bun run lint`, `bun run format`,
 | `APP_URL`                                   | canonical origin used to build the OAuth callback URL          |
 | `LICENSE_DISABLED`                          | `1` bypasses the admin write gate in development only          |
 
-`.env` is git-ignored; `.env.example` is the committed template.
+`.env` is **not** committed. This repository is public, so the live credentials
+live only in the host's environment settings. `.env.example` lists every key the
+app needs; copy it to `.env` for local development.
 
 ## How it fits together
 
