@@ -10,6 +10,8 @@ export type StoreSettings = {
   flatShippingCents: number;
   storeEmail: string;
   storePhone: string;
+  /** "cms" renders the landing sections; anything else renders the designed homepage. */
+  homeSource: string;
 };
 
 const DEFAULT_SETTINGS: StoreSettings = {
@@ -17,6 +19,7 @@ const DEFAULT_SETTINGS: StoreSettings = {
   flatShippingCents: 1900,
   storeEmail: "",
   storePhone: "",
+  homeSource: "static",
 };
 
 async function loadSettings(): Promise<StoreSettings> {
@@ -30,6 +33,7 @@ async function loadSettings(): Promise<StoreSettings> {
     flatShippingCents: Number(map.get("flat_shipping_cents")) || DEFAULT_SETTINGS.flatShippingCents,
     storeEmail: map.get("store_email") || DEFAULT_SETTINGS.storeEmail,
     storePhone: map.get("store_phone") || DEFAULT_SETTINGS.storePhone,
+    homeSource: map.get("home_source") || DEFAULT_SETTINGS.homeSource,
   };
 }
 
@@ -79,6 +83,23 @@ export const saveSettings = createServerFn({ method: "POST" })
       args: [key, value, now],
     }));
     await getTurso().batch(statements, "write");
+    return { ok: true };
+  });
+
+/** Chooses which homepage renders. Defaults to the designed homepage. */
+export const setHomeSource = createServerFn({ method: "POST" })
+  .middleware([requireAuth])
+  .validator((input) => z.object({ homeSource: z.enum(["static", "cms"]) }).parse(input))
+  .handler(async ({ data, context }) => {
+    await assertAdmin(context.userId);
+    const { getTurso } = await turso();
+    const now = new Date().toISOString();
+    await getTurso().execute({
+      sql: `INSERT INTO settings (key, value, updated_at)
+            VALUES ('home_source', ?, ?)
+            ON CONFLICT(key) DO UPDATE SET value = excluded.value, updated_at = excluded.updated_at`,
+      args: [data.homeSource, now],
+    });
     return { ok: true };
   });
 

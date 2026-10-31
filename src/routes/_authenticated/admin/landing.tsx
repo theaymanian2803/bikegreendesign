@@ -32,6 +32,7 @@ import {
   type LandingSectionType,
 } from "@/lib/landing";
 import { getTopBarSettings, saveTopBarSettings, type TopBarSettings } from "@/lib/topbar.functions";
+import { getAdminSettings, setHomeSource } from "@/lib/settings.functions";
 
 export const Route = createFileRoute("/_authenticated/admin/landing")({
   head: () => ({
@@ -1089,6 +1090,10 @@ function LandingAdminPage() {
       </header>
 
       <section className="mt-8 rounded-lg border border-border p-4 sm:p-6">
+        <HomeSourceCard />
+      </section>
+
+      <section className="mt-8 rounded-lg border border-border p-4 sm:p-6">
         <div className="flex flex-wrap items-start justify-between gap-3">
           <div>
             <h2 className="font-display text-lg font-bold text-ink">Top bar</h2>
@@ -1317,5 +1322,60 @@ function LandingAdminPage() {
         </DialogContent>
       </Dialog>
     </main>
+  );
+}
+
+/** Switches the public homepage between the designed page and these sections. */
+function HomeSourceCard() {
+  const [homeSource, setSource] = useState<"static" | "cms">("static");
+  const [busy, setBusy] = useState(false);
+
+  useEffect(() => {
+    getAdminSettings()
+      .then((settings) => setSource(settings.homeSource === "cms" ? "cms" : "static"))
+      .catch(() => undefined);
+  }, []);
+
+  async function choose(next: "static" | "cms") {
+    setBusy(true);
+    try {
+      await setHomeSource({ data: { homeSource: next } });
+      setSource(next);
+      toast.success(next === "cms" ? "Homepage now renders these sections" : "Homepage restored to the designed page");
+    } catch (error) {
+      toast.error(error instanceof Error ? error.message : "Could not change the homepage");
+    }
+    setBusy(false);
+  }
+
+  return (
+    <div className="flex flex-wrap items-start justify-between gap-4">
+      <div>
+        <h2 className="font-display text-lg font-bold text-ink">Homepage source</h2>
+        <p className="mt-1 max-w-xl font-sans text-xs text-muted-foreground">
+          The storefront currently renders the{" "}
+          <span className="text-ink">
+            {homeSource === "cms" ? "sections below" : "designed homepage"}
+          </span>
+          . Switching to the sections replaces it; the sections keep working either way.
+        </p>
+      </div>
+      <div className="flex gap-2">
+        <Button
+          variant={homeSource === "static" ? "default" : "outline"}
+          disabled={busy}
+          onClick={() => choose("static")}
+        >
+          Designed page
+        </Button>
+        <Button
+          variant={homeSource === "cms" ? "default" : "outline"}
+          disabled={busy}
+          onClick={() => choose("cms")}
+        >
+          These sections
+        </Button>
+      </div>
+    </div>
   );
 }
