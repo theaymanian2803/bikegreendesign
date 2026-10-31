@@ -8,16 +8,26 @@ import { getLandingSections, getPromoPopup } from "@/integrations/turso/landing.
 import { listApprovedReviews } from "@/integrations/turso/reviews.functions";
 import { getSettings } from "@/lib/settings.functions";
 import { resolveHomeSource } from "@/lib/home-source";
+import { safeLoad } from "@/lib/safe-load";
 
 export const Route = createFileRoute("/")({
   loader: async () => {
     const [products, categories, reviews, sections, popup, settings] = await Promise.all([
-      listCatalogProducts(),
-      listCatalogCategories(),
-      listApprovedReviews({ data: 6 }),
-      getLandingSections(),
-      getPromoPopup(),
-      getSettings(),
+      safeLoad([], () => listCatalogProducts()),
+      safeLoad([], () => listCatalogCategories()),
+      safeLoad([], () => listApprovedReviews({ data: 6 })),
+      safeLoad([], () => getLandingSections()),
+      safeLoad(null, () => getPromoPopup()),
+      safeLoad(
+        {
+          freeShippingThresholdCents: 0,
+          flatShippingCents: 0,
+          storeEmail: "",
+          storePhone: "",
+          homeSource: "static",
+        },
+        () => getSettings(),
+      ),
     ]);
     return {
       products,

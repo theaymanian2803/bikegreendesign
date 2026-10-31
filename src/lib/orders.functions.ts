@@ -15,7 +15,7 @@ const orderItemSchema = z.object({
   qty: z.number().int().positive().max(999),
 });
 
-const placeOrderSchema = z.object({
+export const placeOrderSchema = z.object({
   firstName: z.string().trim().min(1, "First name is required").max(60),
   lastName: z.string().trim().min(1, "Last name is required").max(60),
   email: z.string().trim().email("Enter a valid email address").max(255),

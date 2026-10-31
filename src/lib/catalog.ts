@@ -10,6 +10,8 @@ export type CatalogProduct = {
   image: string;
   badge?: string;
   category: string;
+  /** The category's stored slug — what `/shop?category=` matches on. */
+  categorySlug: string;
   brand?: string;
   sku?: string;
   description?: string;

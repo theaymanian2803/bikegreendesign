@@ -14,6 +14,7 @@ import {
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { useAdminWriteGuard } from "@/hooks/use-admin-write-guard";
 
 export const Route = createFileRoute("/_authenticated/admin/menu")({
   head: () => ({
@@ -110,6 +111,7 @@ function AdminPage() {
   const [allProducts, setAllProducts] = useState<ProductRow[]>([]);
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
+  const { requireWrite } = useAdminWriteGuard();
 
   const menu = useMemo(() => menus.find((m) => m.key === activeKey), [menus, activeKey]);
   const categories = useMemo(
@@ -156,6 +158,7 @@ function AdminPage() {
 
   async function saveAll() {
     if (!menu) return;
+    if (!requireWrite()) return;
     setSaving(true);
     try {
       await saveMegaMenu({
@@ -173,6 +176,7 @@ function AdminPage() {
   }
 
   async function addCategory() {
+    if (!requireWrite()) return;
     try {
       const row = await addMegaMenuCategory({ data: { menuKey: activeKey } });
       setCategories((prev) => [...prev, row]);
@@ -182,6 +186,7 @@ function AdminPage() {
   }
 
   async function addProduct() {
+    if (!requireWrite()) return;
     try {
       const row = await addMegaMenuProduct({ data: { menuKey: activeKey } });
       setProducts((prev) => [...prev, row]);
@@ -191,6 +196,7 @@ function AdminPage() {
   }
 
   async function removeCategory(id: number) {
+    if (!requireWrite()) return;
     try {
       await removeMegaMenuCategory({ data: { id } });
       setCategories((prev) => prev.filter((c) => c.id !== id));
@@ -200,6 +206,7 @@ function AdminPage() {
   }
 
   async function removeProduct(id: number) {
+    if (!requireWrite()) return;
     try {
       await removeMegaMenuProduct({ data: { id } });
       setProducts((prev) => prev.filter((p) => p.id !== id));

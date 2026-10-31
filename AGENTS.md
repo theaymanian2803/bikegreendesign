@@ -87,3 +87,20 @@ sessions; checkout requires a signed-in email or guest account.
 - Onboarding/demo UI is driven by the `demo_mode` setting. Tour progress lives
   in `sessionStorage` so it survives the Google OAuth redirect; completion and
   banner dismissal live in `localStorage`.
+
+## Added in this project
+
+- **Homepage source.** `settings.home_source` selects the renderer: `static`
+  (default) draws `src/components/site/HomeStatic.tsx`, `cms` draws the landing
+  sections from `getLandingSections`. Toggle it at the top of `/admin/landing`.
+  Never default to `cms`: this database already holds landing sections from the
+  previous store and they would replace the design.
+- **Mega menu admin** lives at `/admin/menu` (the backend had the server
+  functions but no screen for them).
+- **Mobile API base URL** is `EXPO_PUBLIC_API_URL`, defaulting to
+  `http://10.0.2.2:8080` in `mobile/lib/api.ts` (Android emulator loopback).
+- **Storefront loaders never throw on a database error** - they fall back to
+  empty data via `src/lib/safe-load.ts`, so the shop renders an empty state
+  instead of a 500 page.
+- **Category filtering** matches `products.categorySlug` (the stored slug), never
+  a slug re-derived from the category name.

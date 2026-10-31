@@ -1329,6 +1329,7 @@ function LandingAdminPage() {
 function HomeSourceCard() {
   const [homeSource, setSource] = useState<"static" | "cms">("static");
   const [busy, setBusy] = useState(false);
+  const { requireWrite } = useAdminWriteGuard();
 
   useEffect(() => {
     getAdminSettings()
@@ -1337,6 +1338,7 @@ function HomeSourceCard() {
   }, []);
 
   async function choose(next: "static" | "cms") {
+    if (!requireWrite()) return;
     setBusy(true);
     try {
       await setHomeSource({ data: { homeSource: next } });

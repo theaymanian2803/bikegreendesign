@@ -8,6 +8,8 @@ import { ProductCard } from "@/components/site/ProductCard";
 import { NewsletterForm } from "@/components/site/NewsletterForm";
 import { listCatalogCategories, listCatalogProducts } from "@/integrations/turso/catalog.functions";
 import type { CatalogCategory, CatalogProduct } from "@/lib/catalog";
+import { filterByCategory } from "@/lib/catalog-filters";
+import { safeLoad } from "@/lib/safe-load";
 import shopBanner from "@/assets/cta-road.jpg";
 import cityRide from "@/assets/service-test.jpg";
 import trailRide from "@/assets/about-mechanic.jpg";
@@ -24,8 +26,8 @@ export const Route = createFileRoute("/shop")({
   validateSearch: shopSearchSchema,
   loader: async (): Promise<{ products: CatalogProduct[]; categories: CatalogCategory[] }> => {
     const [products, categories] = await Promise.all([
-      listCatalogProducts(),
-      listCatalogCategories(),
+      safeLoad([], () => listCatalogProducts()),
+      safeLoad([], () => listCatalogCategories()),
     ]);
     return { products, categories };
   },
@@ -53,8 +55,7 @@ function ShopPage() {
   const navigate = useNavigate({ from: Route.fullPath });
 
   const visible = useMemo(() => {
-    let list = products;
-    if (category) list = list.filter((p) => slugify(p.category) === category);
+    let list = filterByCategory(products, category);
     if (sort === "price-asc") list = [...list].sort((a, b) => a.price - b.price);
     if (sort === "price-desc") list = [...list].sort((a, b) => b.price - a.price);
     if (sort === "name-asc") list = [...list].sort((a, b) => a.name.localeCompare(b.name));
@@ -297,14 +298,6 @@ function ShopPage() {
       <Footer />
     </div>
   );
-}
-
-function slugify(value: string) {
-  return value
-    .toLowerCase()
-    .trim()
-    .replace(/[^a-z0-9]+/g, "-")
-    .replace(/^-|-$/g, "");
 }
 
 function FilterGroup({ title, children }: { title: string; children: React.ReactNode }) {

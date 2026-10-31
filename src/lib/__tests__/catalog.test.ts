@@ -24,6 +24,7 @@ describe("productGallery", () => {
     rating: 5,
     image: "/test-image.jpg",
     category: "Parts",
+    categorySlug: "parts",
   };
 
   it("returns 4 images", () => {

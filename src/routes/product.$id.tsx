@@ -8,6 +8,7 @@ import { ProductCard } from "@/components/site/ProductCard";
 import { useCart } from "@/lib/cart";
 import { useFavorites } from "@/lib/favorites";
 import { productGallery } from "@/lib/catalog";
+import { safeLoad } from "@/lib/safe-load";
 import { getCatalogProduct } from "@/integrations/turso/catalog.functions";
 import {
   createReview,
@@ -17,9 +18,11 @@ import {
 
 export const Route = createFileRoute("/product/$id")({
   loader: async ({ params }) => {
-    const data = await getCatalogProduct({ data: params.id });
+    const data = await safeLoad(null, () => getCatalogProduct({ data: params.id }));
     if (!data) throw notFound();
-    const reviews = await listProductReviews({ data: params.id });
+    const reviews = await safeLoad({ reviews: [], average: 0, count: 0 }, () =>
+      listProductReviews({ data: params.id }),
+    );
     return { ...data, reviews };
   },
   head: ({ loaderData }) => {
@@ -399,7 +402,7 @@ function ReviewForm({
     setBusy(true);
     try {
       await createReview({ data: { productSlug, author, rating, title, body } });
-      toast.success("Thanks � your review is waiting for approval.");
+      toast.success("Thanks - your review is waiting for approval.");
       setAuthor("");
       setTitle("");
       setBody("");
@@ -449,7 +452,7 @@ function ReviewForm({
         className="mt-3 w-full border border-border bg-background px-3 py-2 text-xs outline-none focus:border-primary"
       />
       <button type="submit" disabled={busy} className="btn-brand mt-3">
-        {busy ? "Sending�" : "Submit review"}
+        {busy ? "Sending-" : "Submit review"}
       </button>
     </form>
   );

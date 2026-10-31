@@ -11,6 +11,7 @@ import {
   type TopBarSettings,
 } from "@/lib/topbar.functions";
 import { MegaMenu } from "@/components/site/MegaMenu";
+import { logout } from "@/lib/auth.functions";
 
 const nav = [
   { label: "Home", to: "/" },
@@ -24,8 +25,9 @@ const nav = [
 export function Header() {
   const { count } = useCart();
   const { count: favoriteCount } = useFavorites();
-  const { data: user } = useSessionUser();
+  const { data: user, refetch } = useSessionUser();
   const [openMenu, setOpenMenu] = useState<string | null>(null);
+  const [accountOpen, setAccountOpen] = useState(false);
   const [topBar, setTopBar] = useState<TopBarSettings>(DEFAULT_TOP_BAR_SETTINGS);
 
   useEffect(() => {
@@ -39,6 +41,12 @@ export function Header() {
       active = false;
     };
   }, []);
+
+  async function signOut() {
+    setAccountOpen(false);
+    await logout();
+    await refetch();
+  }
 
   return (
     <header className="w-full">
@@ -104,13 +112,72 @@ export function Header() {
 
           <div className="flex items-center gap-4 text-ink">
             <Search className="size-5" />
-            <Link
-              to={user ? (user.isAdmin ? "/admin" : "/favorites") : "/auth"}
-              aria-label={user ? "Your account" : "Sign in"}
-              className="hidden sm:block"
-            >
-              <User className="size-5" />
-            </Link>
+            <div className="relative hidden sm:block">
+              <button
+                type="button"
+                onClick={() => setAccountOpen((open) => !open)}
+                aria-label={user ? "Your account" : "Sign in"}
+                aria-expanded={accountOpen}
+                className="flex items-center"
+              >
+                <User className="size-5" />
+              </button>
+              {accountOpen ? (
+                <>
+                  <button
+                    type="button"
+                    aria-hidden="true"
+                    tabIndex={-1}
+                    onClick={() => setAccountOpen(false)}
+                    className="fixed inset-0 z-40 cursor-default"
+                  />
+                  <div className="absolute right-0 top-8 z-50 w-56 border border-border bg-background p-4 text-xs shadow-lg">
+                    {user ? (
+                      <>
+                        <p className="font-semibold text-ink">{user.name || "Guest"}</p>
+                        <p className="mt-0.5 truncate text-muted-foreground">{user.email}</p>
+                        <div className="mt-3 space-y-2">
+                          <Link
+                            to="/favorites"
+                            onClick={() => setAccountOpen(false)}
+                            className="block text-muted-foreground hover:text-primary"
+                          >
+                            Favourites
+                          </Link>
+                          {user.isAdmin ? (
+                            <Link
+                              to="/admin"
+                              onClick={() => setAccountOpen(false)}
+                              className="block text-muted-foreground hover:text-primary"
+                            >
+                              Admin dashboard
+                            </Link>
+                          ) : null}
+                          <button
+                            type="button"
+                            onClick={() => void signOut()}
+                            className="block text-left text-muted-foreground hover:text-primary"
+                          >
+                            Sign out
+                          </button>
+                        </div>
+                      </>
+                    ) : (
+                      <>
+                        <p className="text-muted-foreground">You are browsing as a visitor.</p>
+                        <Link
+                          to="/auth"
+                          onClick={() => setAccountOpen(false)}
+                          className="btn-brand mt-3 block text-center"
+                        >
+                          Sign in
+                        </Link>
+                      </>
+                    )}
+                  </div>
+                </>
+              ) : null}
+            </div>
             <Link to="/favorites" className="relative" aria-label="View favorites">
               <Heart className="size-5" />
               <span className="absolute -right-2 -top-2 flex size-4 items-center justify-center rounded-full bg-primary text-[10px] text-primary-foreground">

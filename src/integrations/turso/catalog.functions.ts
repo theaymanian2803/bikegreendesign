@@ -78,7 +78,7 @@ const defaultDescription = (name: string, category: string) =>
 const productSelect = `
   SELECT p.id, p.slug, p.name, p.price, p.old_price, p.badge, p.rating, p.image_url,
          p.brand, p.sku, p.description, p.highlights, p.specs, p.category_id,
-         c.name AS category_name
+         c.name AS category_name, c.slug AS category_slug
   FROM products p
   LEFT JOIN categories c ON c.id = p.category_id`;
 
@@ -96,6 +96,7 @@ function mapProductRow(row: Record<string, unknown>): CatalogProduct {
     image: String(row.image_url),
     badge: row.badge === null ? undefined : String(row.badge),
     category,
+    categorySlug: String(row.category_slug ?? ""),
     brand: row.brand ? String(row.brand) : undefined,
     sku: row.sku ? String(row.sku) : undefined,
     description: String(row.description) || defaultDescription(name, category),
