@@ -44,8 +44,58 @@ function isH3SwallowedErrorBody(body: string): boolean {
   }
 }
 
+async function generateSitemap(request: Request): Promise<Response> {
+  const { getTurso } = await import("@/integrations/turso/client");
+  const client = getTurso();
+
+  const products = await client.execute("SELECT slug, updated_at FROM products ORDER BY id");
+  const categories = await client.execute("SELECT slug FROM categories ORDER BY id");
+
+  const baseUrl = `${new URL(request.url).origin}`;
+  const urls: string[] = [`${baseUrl}/`, `${baseUrl}/shop`];
+
+  for (const row of categories.rows) {
+    urls.push(`${baseUrl}/shop?category=${encodeURIComponent(String(row.slug))}`);
+  }
+
+  for (const row of products.rows) {
+    const slug = String(row.slug);
+    const lastmod = row.updated_at ? String(row.updated_at).split("T")[0] : undefined;
+    urls.push(
+      `  <url>\n    <loc>${baseUrl}/product/${slug}</loc>${
+        lastmod ? `\n    <lastmod>${lastmod}</lastmod>` : ""
+      }\n    <changefreq>weekly</changefreq>\n    <priority>0.8</priority>\n  </url>`,
+    );
+  }
+
+  const staticUrls = [`${baseUrl}/`, `${baseUrl}/shop`]
+    .map(
+      (loc) =>
+        `  <url>\n    <loc>${loc}</loc>\n    <changefreq>daily</changefreq>\n    <priority>1.0</priority>\n  </url>`,
+    )
+    .join("\n");
+
+  const xml = `<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n${staticUrls}\n${urls
+    .slice(2)
+    .join("\n")}\n</urlset>`;
+
+  return new Response(xml, {
+    headers: { "content-type": "application/xml; charset=utf-8" },
+  });
+}
+
 export default {
   async fetch(request: Request, env: unknown, ctx: unknown) {
+    const url = new URL(request.url);
+
+    if (url.pathname === "/sitemap.xml") {
+      try {
+        return await generateSitemap(request);
+      } catch (error) {
+        console.error("sitemap error:", error);
+      }
+    }
+
     try {
       const handler = await getServerEntry();
       const response = await handler.fetch(request, env, ctx);

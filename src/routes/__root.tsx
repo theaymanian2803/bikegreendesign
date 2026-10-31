@@ -7,12 +7,17 @@ import {
   HeadContent,
   Scripts,
 } from "@tanstack/react-router";
-import { useEffect, type ReactNode } from "react";
+import { useEffect, useState, type ReactNode } from "react";
 
 import appCss from "../styles.css?url";
 import { reportLovableError } from "../lib/lovable-error-reporting";
 import { CartProvider } from "../lib/cart";
+import { FavoritesProvider } from "../lib/favorites";
 import { Toaster } from "@/components/ui/sonner";
+import { DemoBanner } from "@/components/site/DemoBanner";
+import { OnboardingDialog } from "@/components/onboarding/OnboardingDialog";
+import { useLicense } from "@/hooks/use-license";
+import { isOnboardingDone, ONBOARDING_RESTART_EVENT } from "@/lib/onboarding";
 
 function NotFoundComponent() {
   return (
@@ -126,10 +131,35 @@ function RootComponent() {
   return (
     <QueryClientProvider client={queryClient}>
       <CartProvider>
-        {/* Required: nested routes render here. Removing <Outlet /> breaks all child routes. */}
-        <Outlet />
-        <Toaster position="top-right" />
+        <FavoritesProvider>
+          <AppShell />
+        </FavoritesProvider>
       </CartProvider>
     </QueryClientProvider>
+  );
+}
+
+function AppShell() {
+  const { status: license } = useLicense();
+  const [tourOpen, setTourOpen] = useState(false);
+
+  useEffect(() => {
+    if (license?.demoMode && !isOnboardingDone()) setTourOpen(true);
+  }, [license?.demoMode]);
+
+  useEffect(() => {
+    const onRestart = () => setTourOpen(true);
+    window.addEventListener(ONBOARDING_RESTART_EVENT, onRestart);
+    return () => window.removeEventListener(ONBOARDING_RESTART_EVENT, onRestart);
+  }, []);
+
+  return (
+    <>
+      <DemoBanner />
+      {/* Required: nested routes render here. Removing <Outlet /> breaks all child routes. */}
+      <Outlet />
+      {tourOpen ? <OnboardingDialog open onOpenChange={setTourOpen} /> : null}
+      <Toaster position="top-right" />
+    </>
   );
 }
