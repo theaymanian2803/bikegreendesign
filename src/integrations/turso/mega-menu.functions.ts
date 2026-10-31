@@ -2,7 +2,7 @@ import { createServerFn } from "@tanstack/react-start";
 import { z } from "zod";
 
 import { requireAuth } from "@/integrations/turso/auth";
-import type { MegaMenuContent } from "@/data/mega-menu";
+import type { MegaMenuContent } from "@/lib/mega-menu";
 
 const turso = () => import("@/integrations/turso/client");
 

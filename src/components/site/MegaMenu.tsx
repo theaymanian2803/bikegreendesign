@@ -5,7 +5,7 @@ import {
   getMegaMenu,
   getMegaMenuSync,
   type MegaMenuContent,
-} from "@/data/mega-menu";
+} from "@/lib/mega-menu";
 
 /**
  * Mega menu panel. Content is fetched through `getMegaMenu(menuKey)` so the
