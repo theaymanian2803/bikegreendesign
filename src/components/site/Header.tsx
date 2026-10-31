@@ -1,8 +1,15 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Link } from "@tanstack/react-router";
 import { Heart, MapPin, Mail, Phone, Search, ShoppingCart, User, ChevronDown } from "lucide-react";
 
 import { useCart } from "@/lib/cart";
+import { useFavorites } from "@/lib/favorites";
+import { useSessionUser } from "@/hooks/use-session-user";
+import {
+  DEFAULT_TOP_BAR_SETTINGS,
+  getTopBarSettings,
+  type TopBarSettings,
+} from "@/lib/topbar.functions";
 import { MegaMenu } from "@/components/site/MegaMenu";
 
 
@@ -17,30 +24,50 @@ const nav = [
 
 export function Header() {
   const { count } = useCart();
+  const { count: favoriteCount } = useFavorites();
+  const { data: user } = useSessionUser();
   const [openMenu, setOpenMenu] = useState<string | null>(null);
+  const [topBar, setTopBar] = useState<TopBarSettings>(DEFAULT_TOP_BAR_SETTINGS);
+
+  useEffect(() => {
+    let active = true;
+    getTopBarSettings()
+      .then((data) => {
+        if (active && data) setTopBar(data);
+      })
+      .catch(() => undefined);
+    return () => {
+      active = false;
+    };
+  }, []);
+
   return (
 
     <header className="w-full">
       <div className="hidden border-b border-border bg-topbar text-topbar-foreground lg:block">
+        {topBar.enabled ? (
         <div className="mx-auto flex max-w-[1200px] items-center justify-between px-4 py-2 text-xs">
           <div className="flex items-center gap-5">
             <span className="flex items-center gap-1.5">
-              <MapPin className="size-3.5 text-primary" /> 507 Union Trade Center, USA
+              <MapPin className="size-3.5 text-primary" /> {topBar.location}
             </span>
             <span className="flex items-center gap-1.5">
-              <Phone className="size-3.5 text-primary" /> (+91) 9876-543-210
+              <Phone className="size-3.5 text-primary" /> {topBar.phone}
             </span>
             <span className="flex items-center gap-1.5">
-              <Mail className="size-3.5 text-primary" /> demo@example.com
+              <Mail className="size-3.5 text-primary" /> {topBar.email}
             </span>
           </div>
           <div className="flex items-center gap-4">
-            <span>Track Order</span>
+            <Link to={topBar.trackOrderHref} className="transition-colors hover:text-primary">
+              Track Order
+            </Link>
             <span>Help Center</span>
             <span>English</span>
             <span>$ USD</span>
           </div>
         </div>
+        ) : null}
       </div>
 
       <div
@@ -80,13 +107,19 @@ export function Header() {
 
           <div className="flex items-center gap-4 text-ink">
             <Search className="size-5" />
-            <User className="hidden size-5 sm:block" />
-            <span className="relative">
+            <Link
+              to={user ? (user.isAdmin ? "/admin" : "/favorites") : "/auth"}
+              aria-label={user ? "Your account" : "Sign in"}
+              className="hidden sm:block"
+            >
+              <User className="size-5" />
+            </Link>
+            <Link to="/favorites" className="relative" aria-label="View favorites">
               <Heart className="size-5" />
               <span className="absolute -right-2 -top-2 flex size-4 items-center justify-center rounded-full bg-primary text-[10px] text-primary-foreground">
-                0
+                {favoriteCount}
               </span>
-            </span>
+            </Link>
             <Link to="/cart" className="relative" aria-label="View cart">
               <ShoppingCart className="size-5" />
               <span className="absolute -right-2 -top-2 flex size-4 items-center justify-center rounded-full bg-primary text-[10px] text-primary-foreground">

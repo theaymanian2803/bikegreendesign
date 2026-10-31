@@ -6,6 +6,9 @@ import { z } from "zod";
 import { Header } from "@/components/site/Header";
 import { Footer } from "@/components/site/Footer";
 import { useCart } from "@/lib/cart";
+import { useSessionUser } from "@/hooks/use-session-user";
+import { placeOrder } from "@/lib/orders.functions";
+import { toast } from "sonner";
 
 export const Route = createFileRoute("/checkout")({
   head: () => {
@@ -55,11 +58,12 @@ const fields: { name: FieldName; label: string; type?: string; full?: boolean }[
 function CheckoutPage() {
   const { items, subtotal, shipping, total, count, clear } = useCart();
   const navigate = useNavigate();
+  const { data: user } = useSessionUser();
   const [errors, setErrors] = useState<Partial<Record<FieldName, string>>>({});
   const [order, setOrder] = useState<{ id: string; email: string; total: number } | null>(null);
   const [placing, setPlacing] = useState(false);
 
-  function handleSubmit(event: React.FormEvent<HTMLFormElement>) {
+  async function handleSubmit(event: React.FormEvent<HTMLFormElement>) {
     event.preventDefault();
     const data = Object.fromEntries(new FormData(event.currentTarget).entries());
     const parsed = checkoutSchema.safeParse(data);
@@ -74,15 +78,26 @@ function CheckoutPage() {
       return;
     }
 
+    if (!user) {
+      void navigate({ to: "/auth", search: { redirect: "/checkout" } });
+      return;
+    }
+
     setErrors({});
     setPlacing(true);
-    const placedTotal = total;
-    const orderId = `PW-${Date.now().toString().slice(-6)}`;
-    window.setTimeout(() => {
-      setOrder({ id: orderId, email: parsed.data.email, total: placedTotal });
-      setPlacing(false);
+    try {
+      const placed = await placeOrder({
+        data: {
+          ...parsed.data,
+          items: items.map((i) => ({ name: i.name, price: i.price, qty: i.qty })),
+        },
+      });
+      setOrder({ id: placed.publicId, email: placed.email, total: placed.total });
       clear();
-    }, 600);
+    } catch (error) {
+      toast.error(error instanceof Error ? error.message : "Could not place your order");
+    }
+    setPlacing(false);
   }
 
   return (

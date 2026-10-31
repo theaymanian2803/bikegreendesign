@@ -1,18 +1,27 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { createFileRoute, Link, useNavigate, notFound } from "@tanstack/react-router";
 import { Star, Check, Truck, ShieldCheck, RotateCcw, Minus, Plus, Heart } from "lucide-react";
+import { toast } from "sonner";
 import { Header } from "@/components/site/Header";
 import { Footer } from "@/components/site/Footer";
 import { ProductCard } from "@/components/site/ProductCard";
 import { useCart } from "@/lib/cart";
-import { getProduct, productGallery, relatedProducts } from "@/data/products";
+import { useFavorites } from "@/lib/favorites";
+import { productGallery } from "@/lib/catalog";
+import { getCatalogProduct } from "@/integrations/turso/catalog.functions";
+import {
+  createReview,
+  listProductReviews,
+  type ProductReviews,
+} from "@/integrations/turso/reviews.functions";
 
 
 export const Route = createFileRoute("/product/$id")({
-  loader: ({ params }) => {
-    const product = getProduct(params.id);
-    if (!product) throw notFound();
-    return { product };
+  loader: async ({ params }) => {
+    const data = await getCatalogProduct({ data: params.id });
+    if (!data) throw notFound();
+    const reviews = await listProductReviews({ data: params.id });
+    return { ...data, reviews };
   },
   head: ({ loaderData }) => {
     if (!loaderData) {
@@ -68,16 +77,28 @@ function ProductNotFound() {
 }
 
 function ProductDetail() {
-  const { product } = Route.useLoaderData();
+  const { product, related, reviews } = Route.useLoaderData();
   const gallery = productGallery(product);
-  const related = relatedProducts(product);
+  const [reviewData, setReviewData] = useState<ProductReviews>(reviews);
   const [active, setActive] = useState(0);
   const [qty, setQty] = useState(1);
   const [tab, setTab] = useState<"description" | "details" | "reviews">("description");
   const [added, setAdded] = useState(false);
   const { add } = useCart();
+  const { isFavorite, toggle } = useFavorites();
   const navigate = useNavigate();
   const soldOut = product.badge === "Out of stock";
+  const favorited = isFavorite(product.id);
+  const average = reviewData.average || product.rating;
+  const reviewCount = reviewData.count;
+
+  async function reloadReviews() {
+    try {
+      setReviewData(await listProductReviews({ data: product.id }));
+    } catch {
+      // keep the last good list
+    }
+  }
 
   const handleAdd = () => {
     add({ id: product.id, name: product.name, price: product.price, image: product.image }, qty);
@@ -157,9 +178,9 @@ function ProductDetail() {
             <h2 className="mt-2 text-2xl leading-tight text-ink">{product.name}</h2>
 
             <div className="mt-3 flex items-center gap-3">
-              <Stars rating={product.rating} />
+              <Stars rating={Math.round(average)} />
               <span className="text-xs text-muted-foreground">
-                {product.rating}.0 Â· 24 reviews
+                {average.toFixed(1)} Â· {reviewCount} {reviewCount === 1 ? "review" : "reviews"}
               </span>
             </div>
 
@@ -240,10 +261,15 @@ function ProductDetail() {
               </button>
               <button
                 type="button"
-                className="flex size-9 items-center justify-center border border-border text-muted-foreground hover:border-primary hover:text-primary"
-                aria-label="Add to wishlist"
+                onClick={() => toggle(product)}
+                className={`flex size-9 items-center justify-center border transition-colors ${
+                  favorited
+                    ? "border-primary text-primary"
+                    : "border-border text-muted-foreground hover:border-primary hover:text-primary"
+                }`}
+                aria-label={favorited ? "Remove from wishlist" : "Add to wishlist"}
               >
-                <Heart className="size-4" />
+                <Heart className={`size-4 ${favorited ? "fill-primary" : ""}`} />
               </button>
 
             </div>
@@ -310,18 +336,23 @@ function ProductDetail() {
 
             {tab === "reviews" ? (
               <div className="max-w-[720px] space-y-5">
-                {[
-                  { name: "Marcus L.", text: "Fitted straight onto my gravel build, shifting has never been crisper." },
-                  { name: "Ana P.", text: "Great quality for the price and the shop fitted it the same day." },
-                ].map((r) => (
-                  <div key={r.name} className="border border-border p-4">
-                    <div className="flex items-center gap-3">
-                      <span className="text-sm text-ink">{r.name}</span>
-                      <Stars rating={5} />
+                {reviewData.reviews.length === 0 ? (
+                  <p className="text-xs text-muted-foreground">
+                    No reviews yet â€” be the first to write one.
+                  </p>
+                ) : (
+                  reviewData.reviews.map((r) => (
+                    <div key={r.id} className="border border-border p-4">
+                      <div className="flex items-center gap-3">
+                        <span className="text-sm text-ink">{r.author}</span>
+                        <Stars rating={r.rating} />
+                      </div>
+                      {r.title ? <p className="mt-2 text-sm text-ink">{r.title}</p> : null}
+                      <p className="mt-2 text-xs leading-relaxed text-muted-foreground">{r.body}</p>
                     </div>
-                    <p className="mt-2 text-xs leading-relaxed text-muted-foreground">{r.text}</p>
-                  </div>
-                ))}
+                  ))
+                )}
+                <ReviewForm productSlug={product.id} onSubmitted={reloadReviews} />
               </div>
             ) : null}
           </div>
@@ -343,5 +374,79 @@ function ProductDetail() {
 
       <Footer />
     </div>
+  );
+}
+
+function ReviewForm({
+  productSlug,
+  onSubmitted,
+}: {
+  productSlug: string;
+  onSubmitted: () => Promise<void>;
+}) {
+  const [author, setAuthor] = useState("");
+  const [rating, setRating] = useState(5);
+  const [title, setTitle] = useState("");
+  const [body, setBody] = useState("");
+  const [busy, setBusy] = useState(false);
+
+  async function submit(event: React.FormEvent<HTMLFormElement>) {
+    event.preventDefault();
+    setBusy(true);
+    try {
+      await createReview({ data: { productSlug, author, rating, title, body } });
+      toast.success("Thanks — your review is waiting for approval.");
+      setAuthor("");
+      setTitle("");
+      setBody("");
+      setRating(5);
+      await onSubmitted();
+    } catch (error) {
+      toast.error(error instanceof Error ? error.message : "Could not submit your review");
+    }
+    setBusy(false);
+  }
+
+  return (
+    <form onSubmit={submit} className="border border-border p-4">
+      <h3 className="text-sm text-ink">Write a review</h3>
+      <div className="mt-3 grid gap-3 sm:grid-cols-2">
+        <input
+          required
+          value={author}
+          onChange={(e) => setAuthor(e.target.value)}
+          placeholder="Your name"
+          className="border border-border bg-background px-3 py-2 text-xs outline-none focus:border-primary"
+        />
+        <select
+          value={rating}
+          onChange={(e) => setRating(Number(e.target.value))}
+          className="border border-border bg-background px-3 py-2 text-xs text-ink"
+        >
+          {[5, 4, 3, 2, 1].map((n) => (
+            <option key={n} value={n}>
+              {n} star{n === 1 ? "" : "s"}
+            </option>
+          ))}
+        </select>
+      </div>
+      <input
+        value={title}
+        onChange={(e) => setTitle(e.target.value)}
+        placeholder="Title"
+        className="mt-3 w-full border border-border bg-background px-3 py-2 text-xs outline-none focus:border-primary"
+      />
+      <textarea
+        required
+        value={body}
+        onChange={(e) => setBody(e.target.value)}
+        placeholder="How did it work out?"
+        rows={3}
+        className="mt-3 w-full border border-border bg-background px-3 py-2 text-xs outline-none focus:border-primary"
+      />
+      <button type="submit" disabled={busy} className="btn-brand mt-3">
+        {busy ? "Sending…" : "Submit review"}
+      </button>
+    </form>
   );
 }

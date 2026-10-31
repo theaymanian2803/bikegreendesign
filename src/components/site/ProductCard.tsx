@@ -1,7 +1,7 @@
 import { Link } from "@tanstack/react-router";
 import { Star } from "lucide-react";
 
-import type { Product } from "@/data/products";
+import type { CatalogProduct } from "@/lib/catalog";
 
 function Stars({ rating }: { rating: number }) {
   return (
@@ -18,7 +18,7 @@ function Stars({ rating }: { rating: number }) {
   );
 }
 
-export function ProductCard({ product }: { product: Product }) {
+export function ProductCard({ product }: { product: CatalogProduct }) {
   return (
     <article className="group">
       <Link to="/product/$id" params={{ id: product.id }} className="block">

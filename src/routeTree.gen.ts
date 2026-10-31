@@ -12,8 +12,10 @@ import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as AuthenticatedRouteRouteImport } from './routes/_authenticated/route'
 import { Route as ActivateRouteImport } from './routes/activate'
+import { Route as AuthRouteImport } from './routes/auth'
 import { Route as CartRouteImport } from './routes/cart'
 import { Route as CheckoutRouteImport } from './routes/checkout'
+import { Route as FavoritesRouteImport } from './routes/favorites'
 import { Route as ShopRouteImport } from './routes/shop'
 import { Route as AuthenticatedAdminRouteRouteImport } from './routes/_authenticated/admin/route'
 import { Route as ProductIdRouteImport } from './routes/product.$id'
@@ -52,6 +54,11 @@ const ActivateRoute = ActivateRouteImport.update({
   path: '/activate',
   getParentRoute: () => rootRouteImport,
 } as any)
+const AuthRoute = AuthRouteImport.update({
+  id: '/auth',
+  path: '/auth',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const CartRoute = CartRouteImport.update({
   id: '/cart',
   path: '/cart',
@@ -60,6 +67,11 @@ const CartRoute = CartRouteImport.update({
 const CheckoutRoute = CheckoutRouteImport.update({
   id: '/checkout',
   path: '/checkout',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const FavoritesRoute = FavoritesRouteImport.update({
+  id: '/favorites',
+  path: '/favorites',
   getParentRoute: () => rootRouteImport,
 } as any)
 const ShopRoute = ShopRouteImport.update({
@@ -188,8 +200,10 @@ const ApiAuthGoogleCallbackRoute = ApiAuthGoogleCallbackRouteImport.update({
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/activate': typeof ActivateRoute
+  '/auth': typeof AuthRoute
   '/cart': typeof CartRoute
   '/checkout': typeof CheckoutRoute
+  '/favorites': typeof FavoritesRoute
   '/shop': typeof ShopRoute
   '/admin': typeof AuthenticatedAdminRouteRouteWithChildren
   '/product/$id': typeof ProductIdRoute
@@ -217,8 +231,10 @@ export interface FileRoutesByFullPath {
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/activate': typeof ActivateRoute
+  '/auth': typeof AuthRoute
   '/cart': typeof CartRoute
   '/checkout': typeof CheckoutRoute
+  '/favorites': typeof FavoritesRoute
   '/shop': typeof ShopRoute
   '/product/$id': typeof ProductIdRoute
   '/admin/categories': typeof AuthenticatedAdminCategoriesRoute
@@ -247,8 +263,10 @@ export interface FileRoutesById {
   '/': typeof IndexRoute
   '/_authenticated': typeof AuthenticatedRouteRouteWithChildren
   '/activate': typeof ActivateRoute
+  '/auth': typeof AuthRoute
   '/cart': typeof CartRoute
   '/checkout': typeof CheckoutRoute
+  '/favorites': typeof FavoritesRoute
   '/shop': typeof ShopRoute
   '/_authenticated/admin': typeof AuthenticatedAdminRouteRouteWithChildren
   '/product/$id': typeof ProductIdRoute
@@ -278,8 +296,10 @@ export interface FileRouteTypes {
   fullPaths:
     | '/'
     | '/activate'
+    | '/auth'
     | '/cart'
     | '/checkout'
+    | '/favorites'
     | '/shop'
     | '/admin'
     | '/product/$id'
@@ -307,8 +327,10 @@ export interface FileRouteTypes {
   to:
     | '/'
     | '/activate'
+    | '/auth'
     | '/cart'
     | '/checkout'
+    | '/favorites'
     | '/shop'
     | '/product/$id'
     | '/admin/categories'
@@ -336,8 +358,10 @@ export interface FileRouteTypes {
     | '/'
     | '/_authenticated'
     | '/activate'
+    | '/auth'
     | '/cart'
     | '/checkout'
+    | '/favorites'
     | '/shop'
     | '/_authenticated/admin'
     | '/product/$id'
@@ -367,8 +391,10 @@ export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   AuthenticatedRouteRoute: typeof AuthenticatedRouteRouteWithChildren
   ActivateRoute: typeof ActivateRoute
+  AuthRoute: typeof AuthRoute
   CartRoute: typeof CartRoute
   CheckoutRoute: typeof CheckoutRoute
+  FavoritesRoute: typeof FavoritesRoute
   ShopRoute: typeof ShopRoute
   ProductIdRoute: typeof ProductIdRoute
   ApiAuthGuestRoute: typeof ApiAuthGuestRoute
@@ -404,6 +430,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ActivateRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/auth': {
+      id: '/auth'
+      path: '/auth'
+      fullPath: '/auth'
+      preLoaderRoute: typeof AuthRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/cart': {
       id: '/cart'
       path: '/cart'
@@ -416,6 +449,13 @@ declare module '@tanstack/react-router' {
       path: '/checkout'
       fullPath: '/checkout'
       preLoaderRoute: typeof CheckoutRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/favorites': {
+      id: '/favorites'
+      path: '/favorites'
+      fullPath: '/favorites'
+      preLoaderRoute: typeof FavoritesRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/shop': {
@@ -633,8 +673,10 @@ const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   AuthenticatedRouteRoute: AuthenticatedRouteRouteWithChildren,
   ActivateRoute: ActivateRoute,
+  AuthRoute: AuthRoute,
   CartRoute: CartRoute,
   CheckoutRoute: CheckoutRoute,
+  FavoritesRoute: FavoritesRoute,
   ShopRoute: ShopRoute,
   ProductIdRoute: ProductIdRoute,
   ApiAuthGuestRoute: ApiAuthGuestRoute,
