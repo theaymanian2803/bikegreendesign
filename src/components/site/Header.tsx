@@ -1,25 +1,18 @@
 import { useEffect, useState } from "react";
 import { Link } from "@tanstack/react-router";
-import { Heart, MapPin, Mail, Phone, Search, ShoppingCart, User, ChevronDown } from "lucide-react";
+import { Bike, ChevronDown, MapPin, Menu, ShoppingBag, UserRound, X } from "lucide-react";
 
 import { useCart } from "@/lib/cart";
 import { useFavorites } from "@/lib/favorites";
 import { useSessionUser } from "@/hooks/use-session-user";
-import {
-  DEFAULT_TOP_BAR_SETTINGS,
-  getTopBarSettings,
-  type TopBarSettings,
-} from "@/lib/topbar.functions";
-import { MegaMenu } from "@/components/site/MegaMenu";
 import { logout } from "@/lib/auth.functions";
+import { MegaMenu } from "@/components/site/MegaMenu";
 
 const nav = [
   { label: "Home", to: "/" },
-  { label: "Shop", to: "/shop", caret: true, menuKey: "shop" },
-  { label: "Categories", to: "/shop", caret: true, tag: "New", menuKey: "categories" },
-  { label: "Products", to: "/shop", caret: true, tag: "Hot", menuKey: "products" },
-  { label: "Top Deals", to: "/shop", caret: true, menuKey: "top-deals" },
-  { label: "Elements", to: "/shop", caret: true, menuKey: "elements" },
+  { label: "Bikes", to: "/shop", caret: true, menuKey: "shop" },
+  { label: "Parts & gear", to: "/shop", caret: true, menuKey: "categories" },
+  { label: "Workshop", to: "/#workshop" },
 ];
 
 export function Header() {
@@ -27,20 +20,8 @@ export function Header() {
   const { count: favoriteCount } = useFavorites();
   const { data: user, refetch } = useSessionUser();
   const [openMenu, setOpenMenu] = useState<string | null>(null);
+  const [mobileOpen, setMobileOpen] = useState(false);
   const [accountOpen, setAccountOpen] = useState(false);
-  const [topBar, setTopBar] = useState<TopBarSettings>(DEFAULT_TOP_BAR_SETTINGS);
-
-  useEffect(() => {
-    let active = true;
-    getTopBarSettings()
-      .then((data) => {
-        if (active && data) setTopBar(data);
-      })
-      .catch(() => undefined);
-    return () => {
-      active = false;
-    };
-  }, []);
 
   async function signOut() {
     setAccountOpen(false);
@@ -49,44 +30,34 @@ export function Header() {
   }
 
   return (
-    <header className="w-full">
-      <div className="hidden border-b border-border bg-topbar text-topbar-foreground lg:block">
-        {topBar.enabled ? (
-          <div className="mx-auto flex max-w-[1200px] items-center justify-between px-4 py-2 text-xs">
-            <div className="flex items-center gap-5">
-              <span className="flex items-center gap-1.5">
-                <MapPin className="size-3.5 text-primary" /> {topBar.location}
-              </span>
-              <span className="flex items-center gap-1.5">
-                <Phone className="size-3.5 text-primary" /> {topBar.phone}
-              </span>
-              <span className="flex items-center gap-1.5">
-                <Mail className="size-3.5 text-primary" /> {topBar.email}
-              </span>
-            </div>
-            <div className="flex items-center gap-4">
-              <Link to={topBar.trackOrderHref} className="transition-colors hover:text-primary">
-                Track Order
-              </Link>
-              <span>Help Center</span>
-              <span>English</span>
-              <span>$ USD</span>
-            </div>
-          </div>
-        ) : null}
+    <header className="site-header-shadow relative z-30 w-full">
+      <div className="bg-secondary text-secondary-foreground">
+        <div className="site-container flex min-h-9 items-center justify-between gap-3 text-[10px] font-semibold uppercase tracking-[.12em] sm:text-[11px]">
+          <span>Free delivery on orders over $300</span>
+          <span className="hidden items-center gap-2 text-secondary-foreground/80 sm:flex">
+            <MapPin className="size-3.5 text-accent" /> 507 Union Trade Center
+          </span>
+          <Link to="/shop" className="text-accent transition-colors hover:text-white">
+            Built to ride. Ready to roll.
+          </Link>
+        </div>
       </div>
 
       <div
-        className="relative border-b border-border bg-background"
+        className="relative border-b border-border bg-background/95 backdrop-blur"
         onMouseLeave={() => setOpenMenu(null)}
       >
-        <div className="mx-auto flex max-w-[1200px] items-center justify-between gap-6 px-4 py-4">
-          <Link to="/" className="flex items-center font-display text-2xl font-bold tracking-tight">
-            <span className="rounded-sm bg-primary px-2 py-0.5 text-primary-foreground">Path</span>
-            <span className="pl-1 text-ink">way</span>
+        <div className="site-container flex min-h-[76px] items-center justify-between gap-5">
+          <Link to="/" className="flex shrink-0 items-center gap-2.5" aria-label="Pathway home">
+            <span className="flex size-10 items-center justify-center bg-primary text-primary-foreground">
+              <Bike className="size-6" strokeWidth={2.1} />
+            </span>
+            <span className="font-display text-[21px] font-bold leading-none tracking-[-.075em] text-ink">
+              PATHWAY<span className="text-primary">.</span>
+            </span>
           </Link>
 
-          <nav className="hidden items-center gap-6 lg:flex">
+          <nav aria-label="Main navigation" className="hidden items-center gap-8 lg:flex">
             {nav.map((item) => (
               <Link
                 key={item.label}
@@ -95,32 +66,29 @@ export function Header() {
                 onMouseEnter={() => setOpenMenu(item.menuKey ?? null)}
                 onFocus={() => setOpenMenu(item.menuKey ?? null)}
                 aria-expanded={item.menuKey ? openMenu === item.menuKey : undefined}
-                className={`flex items-center gap-1 font-display text-[13px] font-bold uppercase tracking-wide transition-colors hover:text-primary ${
+                className={`flex items-center gap-1 font-sans text-[12px] font-bold uppercase tracking-[.09em] transition-colors hover:text-primary ${
                   openMenu && openMenu === item.menuKey ? "text-primary" : "text-ink"
                 }`}
               >
                 {item.label}
-                {item.tag ? (
-                  <span className="rounded-sm bg-primary px-1 py-px text-[9px] uppercase text-primary-foreground">
-                    {item.tag}
-                  </span>
-                ) : null}
                 {item.caret ? <ChevronDown className="size-3" /> : null}
               </Link>
             ))}
           </nav>
 
-          <div className="flex items-center gap-4 text-ink">
-            <Search className="size-5" />
-            <div className="relative hidden sm:block">
+          <div className="flex items-center gap-2 text-ink">
+            <div className="relative">
               <button
                 type="button"
                 onClick={() => setAccountOpen((open) => !open)}
-                aria-label={user ? "Your account" : "Sign in"}
+                aria-label={user ? "My account" : "Sign in"}
                 aria-expanded={accountOpen}
-                className="flex items-center"
+                className="flex size-10 items-center justify-center transition-colors hover:bg-surface hover:text-primary"
               >
-                <User className="size-5" />
+                <UserRound className="size-[18px]" />
+                {favoriteCount > 0 ? (
+                  <span className="absolute right-1 top-1 size-1.5 rounded-full bg-primary" />
+                ) : null}
               </button>
               {accountOpen ? (
                 <>
@@ -131,10 +99,12 @@ export function Header() {
                     onClick={() => setAccountOpen(false)}
                     className="fixed inset-0 z-40 cursor-default"
                   />
-                  <div className="absolute right-0 top-8 z-50 w-56 border border-border bg-background p-4 text-xs shadow-lg">
+                  <div className="absolute right-0 top-12 z-50 w-60 border border-border bg-background p-4 text-xs shadow-xl">
                     {user ? (
                       <>
-                        <p className="font-semibold text-ink">{user.name || "Guest"}</p>
+                        <p className="font-display text-sm font-semibold text-ink">
+                          {user.name || "Guest"}
+                        </p>
                         <p className="mt-0.5 truncate text-muted-foreground">{user.email}</p>
                         <div className="mt-3 space-y-2">
                           <Link
@@ -142,7 +112,7 @@ export function Header() {
                             onClick={() => setAccountOpen(false)}
                             className="block text-muted-foreground hover:text-primary"
                           >
-                            Favourites
+                            Favourites ({favoriteCount})
                           </Link>
                           {user.isAdmin ? (
                             <Link
@@ -164,7 +134,9 @@ export function Header() {
                       </>
                     ) : (
                       <>
-                        <p className="text-muted-foreground">You are browsing as a visitor.</p>
+                        <p className="text-muted-foreground">
+                          Sign in to track orders and save favourites.
+                        </p>
                         <Link
                           to="/auth"
                           onClick={() => setAccountOpen(false)}
@@ -178,18 +150,25 @@ export function Header() {
                 </>
               ) : null}
             </div>
-            <Link to="/favorites" className="relative" aria-label="View favorites">
-              <Heart className="size-5" />
-              <span className="absolute -right-2 -top-2 flex size-4 items-center justify-center rounded-full bg-primary text-[10px] text-primary-foreground">
-                {favoriteCount}
-              </span>
-            </Link>
-            <Link to="/cart" className="relative" aria-label="View cart">
-              <ShoppingCart className="size-5" />
-              <span className="absolute -right-2 -top-2 flex size-4 items-center justify-center rounded-full bg-primary text-[10px] text-primary-foreground">
+            <Link
+              to="/cart"
+              className="relative flex size-10 items-center justify-center bg-secondary text-secondary-foreground transition-colors hover:bg-primary"
+              aria-label={`View cart, ${count} items`}
+            >
+              <ShoppingBag className="size-[18px]" />
+              <span className="absolute -right-1 -top-1 flex size-[18px] items-center justify-center rounded-full bg-primary text-[9px] font-bold text-primary-foreground">
                 {count}
               </span>
             </Link>
+            <button
+              type="button"
+              className="flex size-10 items-center justify-center border border-border lg:hidden"
+              onClick={() => setMobileOpen((open) => !open)}
+              aria-expanded={mobileOpen}
+              aria-label={mobileOpen ? "Close navigation" : "Open navigation"}
+            >
+              {mobileOpen ? <X className="size-5" /> : <Menu className="size-5" />}
+            </button>
           </div>
         </div>
 
@@ -201,17 +180,24 @@ export function Header() {
           </div>
         ) : null}
 
-        <nav className="flex items-center gap-5 overflow-x-auto border-t border-border px-4 py-3 lg:hidden">
-          {nav.map((item) => (
-            <Link
-              key={item.label}
-              to={item.to}
-              className="whitespace-nowrap font-display text-xs font-bold uppercase text-ink"
-            >
-              {item.label}
-            </Link>
-          ))}
-        </nav>
+        {mobileOpen ? (
+          <nav
+            aria-label="Mobile navigation"
+            className="grid gap-1 border-t border-border bg-background px-4 py-3 lg:hidden"
+          >
+            {nav.map((item) => (
+              <Link
+                key={item.label}
+                to={item.to}
+                onClick={() => setMobileOpen(false)}
+                className="flex items-center justify-between px-3 py-3 font-sans text-xs font-bold uppercase tracking-[.1em] text-ink hover:bg-surface hover:text-primary"
+              >
+                {item.label}
+                {item.caret ? <ChevronDown className="size-3" /> : null}
+              </Link>
+            ))}
+          </nav>
+        ) : null}
       </div>
     </header>
   );

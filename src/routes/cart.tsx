@@ -32,10 +32,10 @@ function CartPage() {
     <div className="min-h-screen bg-background">
       <Header />
 
-      <section className="bg-ink py-8">
-        <div className="mx-auto max-w-[1200px] px-4 text-center">
-          <h1 className="text-xl text-ink-foreground">Shopping Cart</h1>
-          <p className="mt-1 text-xs text-ink-foreground/70">
+      <section className="border-b border-border bg-surface py-5">
+        <div className="site-container">
+          <h1 className="text-2xl tracking-[-.04em] text-ink">Your basket</h1>
+          <p className="mt-1 text-xs text-muted-foreground">
             <Link to="/" className="hover:text-primary">
               Home
             </Link>{" "}
@@ -44,11 +44,16 @@ function CartPage() {
         </div>
       </section>
 
-      <main className="mx-auto max-w-[1200px] px-4 py-12">
+      <main className="site-container min-h-[45vh] py-10 sm:py-14">
         {items.length === 0 ? (
-          <div className="mx-auto max-w-[420px] py-16 text-center">
-            <ShoppingCart className="mx-auto size-10 text-primary" />
-            <h2 className="mt-4 text-xl text-ink">Your cart is empty</h2>
+          <div className="mx-auto max-w-[460px] py-16 text-center">
+            <span className="mx-auto flex size-16 items-center justify-center rounded-full bg-accent text-secondary">
+              <ShoppingCart className="size-7" />
+            </span>
+            <p className="site-eyebrow mt-6">Ready for a new ride?</p>
+            <h2 className="mt-2 text-3xl tracking-[-.05em] text-ink">
+              Your basket is taking a breather.
+            </h2>
             <p className="mt-2 text-xs text-muted-foreground">
               Browse the workshop shelves and add some parts to get rolling.
             </p>
@@ -59,7 +64,7 @@ function CartPage() {
         ) : (
           <div className="grid gap-10 lg:grid-cols-[1fr_320px]">
             <div>
-              <div className="hidden border-b border-border pb-3 text-[11px] font-bold uppercase tracking-wide text-muted-foreground sm:grid sm:grid-cols-[1fr_120px_110px_40px] sm:gap-4">
+              <div className="hidden border-b border-border pb-3 text-[10px] font-bold uppercase tracking-[.14em] text-muted-foreground sm:grid sm:grid-cols-[1fr_120px_110px_40px] sm:gap-4">
                 <span>Product</span>
                 <span>Quantity</span>
                 <span className="text-right">Subtotal</span>
@@ -120,7 +125,7 @@ function CartPage() {
                     </button>
                   </div>
 
-                  <span className="text-sm font-semibold text-primary sm:text-right">
+                  <span className="font-display text-sm font-semibold text-ink sm:text-right">
                     ${(item.price * item.qty).toFixed(2)}
                   </span>
 
@@ -152,8 +157,9 @@ function CartPage() {
               </div>
             </div>
 
-            <aside className="h-fit border border-border p-6">
-              <h2 className="text-lg text-ink">Order Summary</h2>
+            <aside className="admin-panel h-fit border border-border p-6 lg:sticky lg:top-6">
+              <p className="site-eyebrow">At a glance</p>
+              <h2 className="mt-2 text-xl tracking-[-.04em] text-ink">Order summary</h2>
               <dl className="mt-4 space-y-3 text-xs">
                 <div className="flex justify-between">
                   <dt className="text-muted-foreground">Items</dt>
@@ -171,7 +177,7 @@ function CartPage() {
                 </div>
                 <div className="flex justify-between border-t border-border pt-3">
                   <dt className="font-bold uppercase tracking-wide text-ink">Total</dt>
-                  <dd className="text-lg font-bold text-primary">${total.toFixed(2)}</dd>
+                  <dd className="font-display text-xl font-bold text-ink">${total.toFixed(2)}</dd>
                 </div>
               </dl>
               <p className="mt-3 text-[11px] text-muted-foreground">

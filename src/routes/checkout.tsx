@@ -10,6 +10,8 @@ import { useSessionUser } from "@/hooks/use-session-user";
 import { placeOrder } from "@/lib/orders.functions";
 import { toast } from "sonner";
 
+type PlacedOrder = { id: string; email: string; total: number };
+
 export const Route = createFileRoute("/checkout")({
   head: () => {
     const title = "Checkout — Pathway Bike Shop";
@@ -58,10 +60,11 @@ const fields: { name: FieldName; label: string; type?: string; full?: boolean }[
 function CheckoutPage() {
   const { items, subtotal, shipping, total, count, clear } = useCart();
   const navigate = useNavigate();
-  const { data: user } = useSessionUser();
+  const { data: user, isLoading: sessionLoading } = useSessionUser();
   const [errors, setErrors] = useState<Partial<Record<FieldName, string>>>({});
-  const [order, setOrder] = useState<{ id: string; email: string; total: number } | null>(null);
+  const [order, setOrder] = useState<PlacedOrder | null>(null);
   const [placing, setPlacing] = useState(false);
+  const [serverError, setServerError] = useState<string | null>(null);
 
   async function handleSubmit(event: React.FormEvent<HTMLFormElement>) {
     event.preventDefault();
@@ -78,36 +81,47 @@ function CheckoutPage() {
       return;
     }
 
+    setErrors({});
+    setServerError(null);
+
+    if (sessionLoading) return;
     if (!user) {
       void navigate({ to: "/auth", search: { redirect: "/checkout" } });
       return;
     }
 
-    setErrors({});
     setPlacing(true);
+
     try {
-      const placed = await placeOrder({
+      const result = await placeOrder({
         data: {
           ...parsed.data,
-          items: items.map((i) => ({ id: i.id, name: i.name, price: i.price, qty: i.qty })),
+          items: items.map((i) => ({
+            id: i.id,
+            name: i.name,
+            price: i.price,
+            image: i.image,
+            qty: i.qty,
+          })),
         },
       });
-      setOrder({ id: placed.publicId, email: placed.email, total: placed.total });
+      setOrder({ id: result.publicId, email: result.email, total: result.total });
       clear();
-    } catch (error) {
-      toast.error(error instanceof Error ? error.message : "Could not place your order");
+    } catch (e) {
+      setServerError(e instanceof Error ? e.message : "Failed to place order. Please try again.");
+    } finally {
+      setPlacing(false);
     }
-    setPlacing(false);
   }
 
   return (
     <div className="min-h-screen bg-background">
       <Header />
 
-      <section className="bg-ink py-8">
-        <div className="mx-auto max-w-[1200px] px-4 text-center">
-          <h1 className="text-xl text-ink-foreground">Checkout</h1>
-          <p className="mt-1 text-xs text-ink-foreground/70">
+      <section className="border-b border-border bg-surface py-5">
+        <div className="site-container">
+          <h1 className="text-2xl tracking-[-.04em] text-ink">Checkout</h1>
+          <p className="mt-1 text-xs text-muted-foreground">
             <Link to="/" className="hover:text-primary">
               Home
             </Link>{" "}
@@ -120,10 +134,13 @@ function CheckoutPage() {
         </div>
       </section>
 
-      <main className="mx-auto max-w-[1200px] px-4 py-12">
+      <main className="site-container min-h-[45vh] py-10 sm:py-14">
         {order ? (
-          <div className="mx-auto max-w-[520px] border border-border p-10 text-center">
-            <CheckCircle2 className="mx-auto size-10 text-primary" />
+          <div className="admin-panel mx-auto max-w-[560px] border border-border p-8 text-center sm:p-10">
+            <span className="mx-auto flex size-16 items-center justify-center rounded-full bg-accent text-secondary">
+              <CheckCircle2 className="size-8" />
+            </span>
+            <p className="site-eyebrow mt-6">You’re all set</p>
             <h2 className="mt-4 text-xl text-ink">Thank you, your order is placed!</h2>
             <p className="mt-2 text-xs text-muted-foreground">
               Order <span className="font-bold text-ink">{order.id}</span> — a confirmation was sent
@@ -155,9 +172,10 @@ function CheckoutPage() {
             </Link>
           </div>
         ) : (
-          <form onSubmit={handleSubmit} noValidate className="grid gap-10 lg:grid-cols-[1fr_320px]">
+          <form onSubmit={handleSubmit} noValidate className="grid gap-10 lg:grid-cols-[1fr_350px]">
             <div>
-              <h2 className="text-lg text-ink">Shipping &amp; Contact Details</h2>
+              <p className="site-eyebrow">One last stretch</p>
+              <h2 className="mt-2 text-2xl tracking-[-.04em] text-ink">Where should we send it?</h2>
               <div className="mt-5 grid gap-4 sm:grid-cols-2">
                 {fields.map((field) => (
                   <div key={field.name} className={field.full ? "sm:col-span-2" : undefined}>
@@ -173,7 +191,7 @@ function CheckoutPage() {
                       type={field.type ?? "text"}
                       maxLength={255}
                       aria-invalid={errors[field.name] ? true : undefined}
-                      className="mt-1.5 w-full border border-border bg-background px-3 py-2.5 text-sm text-ink outline-none focus:border-primary"
+                      className="form-control mt-1.5 w-full px-3 py-3 text-sm outline-none"
                     />
                     {errors[field.name] ? (
                       <p className="mt-1 text-[11px] text-primary">{errors[field.name]}</p>
@@ -192,14 +210,21 @@ function CheckoutPage() {
                     name="notes"
                     rows={4}
                     maxLength={500}
-                    className="mt-1.5 w-full border border-border bg-background px-3 py-2.5 text-sm text-ink outline-none focus:border-primary"
+                    className="form-control mt-1.5 w-full px-3 py-3 text-sm outline-none"
                   />
                 </div>
               </div>
+
+              {serverError ? (
+                <p className="mt-4 rounded border border-primary/30 bg-primary/10 px-4 py-3 text-xs text-primary">
+                  {serverError}
+                </p>
+              ) : null}
             </div>
 
-            <aside className="h-fit border border-border p-6">
-              <h2 className="text-lg text-ink">Order Summary</h2>
+            <aside className="admin-panel h-fit border border-border p-6 lg:sticky lg:top-6">
+              <p className="site-eyebrow">Ready to roll</p>
+              <h2 className="mt-2 text-xl tracking-[-.04em] text-ink">Order summary</h2>
               <ul className="mt-4 space-y-3">
                 {items.map((item) => (
                   <li key={item.id} className="flex items-center gap-3">
@@ -215,7 +240,7 @@ function CheckoutPage() {
                       {item.name}
                       <span className="text-muted-foreground"> × {item.qty}</span>
                     </span>
-                    <span className="text-xs font-semibold text-primary">
+                    <span className="text-xs font-semibold text-ink">
                       ${(item.price * item.qty).toFixed(2)}
                     </span>
                   </li>
@@ -238,7 +263,7 @@ function CheckoutPage() {
                 </div>
                 <div className="flex justify-between border-t border-border pt-3">
                   <dt className="font-bold uppercase tracking-wide text-ink">Total</dt>
-                  <dd className="text-lg font-bold text-primary">${total.toFixed(2)}</dd>
+                  <dd className="font-display text-xl font-bold text-ink">${total.toFixed(2)}</dd>
                 </div>
               </dl>
               <button type="submit" disabled={placing} className="btn-brand mt-5 w-full">

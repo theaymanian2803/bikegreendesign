@@ -1,8 +1,8 @@
 import { createFileRoute } from "@tanstack/react-router";
 
+import { HomeStatic } from "@/components/site/HomeStatic";
 import { LandingSections } from "@/components/site/landing/landing-sections";
 import { PromoPopup } from "@/components/site/PromoPopup";
-import { HomeStatic } from "@/components/site/HomeStatic";
 import { listCatalogCategories, listCatalogProducts } from "@/integrations/turso/catalog.functions";
 import { getLandingSections, getPromoPopup } from "@/integrations/turso/landing.functions";
 import { listApprovedReviews } from "@/integrations/turso/reviews.functions";
@@ -40,17 +40,16 @@ export const Route = createFileRoute("/")({
   },
   head: () => ({
     meta: [
-      { title: "Pathway Bike Shop — E-Bikes, Parts & Full Service Repairs" },
+      { title: "Pathway Cycle Supply — Bikes, Parts & Workshop" },
       {
         name: "description",
         content:
-          "Pathway is a full service bike shop: city e-bikes, road bikes, premium parts, accessories and expert repairs by certified mechanics.",
+          "Bikes chosen by people who ride them. Parts that earn their place. A workshop that gets you back out there.",
       },
-      { property: "og:title", content: "Pathway Bike Shop — E-Bikes, Parts & Full Service" },
+      { property: "og:title", content: "Pathway Cycle Supply — Bikes, Parts & Workshop" },
       {
         property: "og:description",
-        content:
-          "Shop city e-bikes, gear and bicycle parts, and book expert maintenance at the Pathway repair workshop.",
+        content: "Good bikes, honest advice and a workshop built around riding.",
       },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary_large_image" },

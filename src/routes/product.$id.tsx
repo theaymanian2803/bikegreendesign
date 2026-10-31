@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { createFileRoute, Link, useNavigate, notFound } from "@tanstack/react-router";
 import { Star, Check, Truck, ShieldCheck, RotateCcw, Minus, Plus, Heart } from "lucide-react";
 import { toast } from "sonner";
@@ -7,23 +7,45 @@ import { Footer } from "@/components/site/Footer";
 import { ProductCard } from "@/components/site/ProductCard";
 import { useCart } from "@/lib/cart";
 import { useFavorites } from "@/lib/favorites";
-import { productGallery } from "@/lib/catalog";
-import { safeLoad } from "@/lib/safe-load";
+import type { CatalogProduct } from "@/lib/catalog";
 import { getCatalogProduct } from "@/integrations/turso/catalog.functions";
 import {
   createReview,
   listProductReviews,
   type ProductReviews,
+  type ReviewRow,
 } from "@/integrations/turso/reviews.functions";
+import { safeLoad } from "@/lib/safe-load";
 
 export const Route = createFileRoute("/product/$id")({
   loader: async ({ params }) => {
     const data = await safeLoad(null, () => getCatalogProduct({ data: params.id }));
     if (!data) throw notFound();
-    const reviews = await safeLoad({ reviews: [], average: 0, count: 0 }, () =>
+
+    const reviewData = await safeLoad<ProductReviews>({ reviews: [], average: 0, count: 0 }, () =>
       listProductReviews({ data: params.id }),
     );
-    return { ...data, reviews };
+
+    const product = {
+      ...data.product,
+      image_url: data.product.image,
+      old_price: data.product.oldPrice ?? null,
+      in_stock: data.product.badge !== "Out of stock",
+    };
+
+    return {
+      product,
+      related: data.related,
+      reviews: reviewData.reviews.map((r) => ({
+        id: r.id,
+        reviewer_name: r.author,
+        rating: r.rating,
+        title: r.title,
+        body: r.body,
+        created_at: r.createdAt,
+      })),
+      reviewStats: reviewData,
+    };
   },
   head: ({ loaderData }) => {
     if (!loaderData) {
@@ -82,32 +104,59 @@ function ProductNotFound() {
   );
 }
 
+// Gallery images cycle through sibling product images for variety
+const GALLERY_FALLBACKS = [
+  "/products/p-derailleur.jpg",
+  "/products/p-wheel.jpg",
+  "/products/p-crank.jpg",
+  "/products/p-stem.jpg",
+];
+
+function buildGallery(product: { image_url: string }): string[] {
+  const extras = GALLERY_FALLBACKS.filter((g) => g !== product.image_url).slice(0, 3);
+  return [product.image_url, ...extras];
+}
+
 function ProductDetail() {
-  const { product, related, reviews } = Route.useLoaderData();
-  const gallery = productGallery(product);
-  const [reviewData, setReviewData] = useState<ProductReviews>(reviews);
+  const { product, reviews, related, reviewStats } = Route.useLoaderData();
+  const gallery = buildGallery(product);
   const [active, setActive] = useState(0);
   const [qty, setQty] = useState(1);
   const [tab, setTab] = useState<"description" | "details" | "reviews">("description");
   const [added, setAdded] = useState(false);
+  const [reviewList, setReviewList] = useState(reviews);
+  const [stats, setStats] = useState(reviewStats);
   const { add } = useCart();
   const { isFavorite, toggle } = useFavorites();
   const navigate = useNavigate();
-  const soldOut = product.badge === "Out of stock";
+  const soldOut = !product.in_stock || product.badge === "Out of stock";
   const favorited = isFavorite(product.id);
-  const average = reviewData.average || product.rating;
-  const reviewCount = reviewData.count;
+  const rating = stats.count > 0 ? stats.average : product.rating;
 
   async function reloadReviews() {
     try {
-      setReviewData(await listProductReviews({ data: product.id }));
+      const next = await listProductReviews({ data: product.id });
+      setStats(next);
+      setReviewList(
+        next.reviews.map((r: ReviewRow) => ({
+          id: r.id,
+          reviewer_name: r.author,
+          rating: r.rating,
+          title: r.title,
+          body: r.body,
+          created_at: r.createdAt,
+        })),
+      );
     } catch {
-      // keep the last good list
+      /* keep the last good list */
     }
   }
 
   const handleAdd = () => {
-    add({ id: product.id, name: product.name, price: product.price, image: product.image }, qty);
+    add(
+      { id: product.id, name: product.name, price: product.price, image: product.image_url },
+      qty,
+    );
     setAdded(true);
     window.setTimeout(() => setAdded(false), 2000);
   };
@@ -117,10 +166,9 @@ function ProductDetail() {
       <Header />
 
       {/* Breadcrumb banner */}
-      <section className="bg-ink py-8">
-        <div className="mx-auto max-w-[1200px] px-4 text-center">
-          <h1 className="text-xl text-ink-foreground">{product.category}</h1>
-          <p className="mt-1 text-xs text-ink-foreground/70">
+      <section className="border-b border-border bg-surface py-5">
+        <div className="site-container">
+          <p className="text-[10px] font-bold uppercase tracking-[.14em] text-muted-foreground">
             <Link to="/" className="hover:text-primary">
               Home
             </Link>{" "}
@@ -133,13 +181,13 @@ function ProductDetail() {
         </div>
       </section>
 
-      <main className="mx-auto max-w-[1200px] px-4 py-12">
+      <main className="site-container py-10 sm:py-14">
         <div className="grid gap-10 lg:grid-cols-2">
           {/* Gallery */}
           <div>
-            <div className="relative overflow-hidden bg-surface">
+            <div className="product-photo relative overflow-hidden">
               {product.badge ? (
-                <span className="absolute left-3 top-3 z-10 rounded-sm bg-primary px-2 py-0.5 text-[10px] font-bold uppercase text-primary-foreground">
+                <span className="absolute left-4 top-4 z-10 bg-primary px-3 py-1.5 text-[9px] font-bold uppercase tracking-[.12em] text-primary-foreground">
                   {product.badge}
                 </span>
               ) : null}
@@ -157,7 +205,7 @@ function ProductDetail() {
                   key={g + i}
                   type="button"
                   onClick={() => setActive(i)}
-                  className={`overflow-hidden border bg-surface ${
+                  className={`product-photo overflow-hidden border ${
                     i === active ? "border-primary" : "border-border"
                   }`}
                   aria-label={`View image ${i + 1}`}
@@ -177,23 +225,25 @@ function ProductDetail() {
 
           {/* Info */}
           <div>
-            <span className="text-[11px] font-bold uppercase tracking-[0.25em] text-primary">
-              {product.brand}
-            </span>
-            <h2 className="mt-2 text-2xl leading-tight text-ink">{product.name}</h2>
+            <span className="site-eyebrow">{product.brand}</span>
+            <h1 className="mt-3 max-w-xl text-3xl leading-[1.04] tracking-[-.055em] text-ink sm:text-4xl">
+              {product.name}
+            </h1>
 
             <div className="mt-3 flex items-center gap-3">
-              <Stars rating={Math.round(average)} />
+              <Stars rating={Math.round(rating)} />
               <span className="text-xs text-muted-foreground">
-                {average.toFixed(1)} · {reviewCount} {reviewCount === 1 ? "review" : "reviews"}
+                {rating.toFixed(1)} · {stats.count} review{stats.count !== 1 ? "s" : ""}
               </span>
             </div>
 
             <div className="mt-4 flex items-end gap-3">
-              <span className="text-3xl font-bold text-primary">${product.price.toFixed(2)}</span>
-              {product.oldPrice ? (
+              <span className="font-display text-3xl font-semibold tracking-[-.04em] text-ink">
+                ${product.price.toFixed(2)}
+              </span>
+              {product.old_price ? (
                 <span className="pb-1 text-sm text-muted-foreground line-through">
-                  ${product.oldPrice.toFixed(2)}
+                  ${product.old_price.toFixed(2)}
                 </span>
               ) : null}
             </div>
@@ -206,7 +256,7 @@ function ProductDetail() {
             </p>
 
             <ul className="mt-5 space-y-2">
-              {product.highlights?.map((h: string) => (
+              {(product.highlights ?? []).map((h: string) => (
                 <li key={h} className="flex items-start gap-2 text-xs text-ink">
                   <Check className="mt-0.5 size-3.5 shrink-0 text-primary" />
                   {h}
@@ -260,14 +310,14 @@ function ProductDetail() {
                   handleAdd();
                   void navigate({ to: "/cart" });
                 }}
-                className="border border-ink px-5 py-2.5 font-display text-[13px] font-bold uppercase tracking-wide text-ink transition-colors hover:border-primary hover:text-primary disabled:opacity-50"
+                className="border border-secondary px-5 py-2.5 font-display text-[13px] font-bold uppercase tracking-wide text-secondary transition-colors hover:bg-secondary hover:text-secondary-foreground disabled:opacity-50"
               >
                 Buy now
               </button>
               <button
                 type="button"
                 onClick={() => toggle(product)}
-                className={`flex size-9 items-center justify-center border transition-colors ${
+                className={`flex size-10 items-center justify-center border transition-colors ${
                   favorited
                     ? "border-primary text-primary"
                     : "border-border text-muted-foreground hover:border-primary hover:text-primary"
@@ -297,7 +347,7 @@ function ProductDetail() {
         </div>
 
         {/* Tabs */}
-        <div className="mt-14 border-t border-border">
+        <div className="mt-16 border-t border-border">
           <div className="flex flex-wrap gap-6 border-b border-border">
             {(["description", "details", "reviews"] as const).map((t) => (
               <button
@@ -311,6 +361,7 @@ function ProductDetail() {
                 }`}
               >
                 {t}
+                {t === "reviews" ? ` (${stats.count})` : ""}
               </button>
             ))}
           </div>
@@ -331,7 +382,7 @@ function ProductDetail() {
             {tab === "details" ? (
               <table className="w-full max-w-[620px] text-xs">
                 <tbody>
-                  {product.specs?.map((s: { label: string; value: string }) => (
+                  {(product.specs ?? []).map((s) => (
                     <tr key={s.label} className="border-b border-border">
                       <th className="w-40 py-2.5 text-left font-medium text-ink">{s.label}</th>
                       <td className="py-2.5 text-muted-foreground">{s.value}</td>
@@ -343,18 +394,18 @@ function ProductDetail() {
 
             {tab === "reviews" ? (
               <div className="max-w-[720px] space-y-5">
-                {reviewData.reviews.length === 0 ? (
-                  <p className="text-xs text-muted-foreground">
-                    No reviews yet — be the first to write one.
-                  </p>
+                {reviewList.length === 0 ? (
+                  <p className="text-xs text-muted-foreground">No reviews yet. Be the first!</p>
                 ) : (
-                  reviewData.reviews.map((r) => (
+                  reviewList.map((r) => (
                     <div key={r.id} className="border border-border p-4">
                       <div className="flex items-center gap-3">
-                        <span className="text-sm text-ink">{r.author}</span>
+                        <span className="text-sm text-ink">{r.reviewer_name}</span>
                         <Stars rating={r.rating} />
+                        <span className="text-[11px] text-muted-foreground">
+                          {new Date(r.created_at).toLocaleDateString()}
+                        </span>
                       </div>
-                      {r.title ? <p className="mt-2 text-sm text-ink">{r.title}</p> : null}
                       <p className="mt-2 text-xs leading-relaxed text-muted-foreground">{r.body}</p>
                     </div>
                   ))
@@ -415,8 +466,8 @@ function ReviewForm({
   }
 
   return (
-    <form onSubmit={submit} className="border border-border p-4">
-      <h3 className="text-sm text-ink">Write a review</h3>
+    <form onSubmit={submit} className="border border-border bg-surface p-5">
+      <h3 className="font-display text-base font-semibold text-ink">Write a review</h3>
       <div className="mt-3 grid gap-3 sm:grid-cols-2">
         <input
           required
@@ -428,6 +479,7 @@ function ReviewForm({
         <select
           value={rating}
           onChange={(e) => setRating(Number(e.target.value))}
+          aria-label="Rating"
           className="border border-border bg-background px-3 py-2 text-xs text-ink"
         >
           {[5, 4, 3, 2, 1].map((n) => (
@@ -451,8 +503,8 @@ function ReviewForm({
         rows={3}
         className="mt-3 w-full border border-border bg-background px-3 py-2 text-xs outline-none focus:border-primary"
       />
-      <button type="submit" disabled={busy} className="btn-brand mt-3">
-        {busy ? "Sending-" : "Submit review"}
+      <button type="submit" disabled={busy} className="btn-brand mt-4">
+        {busy ? "Sending..." : "Submit review"}
       </button>
     </form>
   );

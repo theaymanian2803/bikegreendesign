@@ -20,9 +20,9 @@ export function ProductCard({ product }: { product: CatalogProduct }) {
   return (
     <article className="group">
       <Link to="/product/$id" params={{ id: product.id }} className="block">
-        <div className="relative overflow-hidden bg-surface">
+        <div className="product-photo relative overflow-hidden">
           {product.badge ? (
-            <span className="absolute left-2 top-2 z-10 rounded-sm bg-primary px-2 py-0.5 text-[10px] font-bold uppercase text-primary-foreground">
+            <span className="absolute left-3 top-3 z-10 bg-primary px-2.5 py-1 text-[9px] font-bold uppercase tracking-[.12em] text-primary-foreground">
               {product.badge}
             </span>
           ) : null}
@@ -32,15 +32,27 @@ export function ProductCard({ product }: { product: CatalogProduct }) {
             loading="lazy"
             width={700}
             height={700}
-            className="aspect-square w-full object-cover transition-transform duration-500 group-hover:scale-105"
+            className="aspect-[4/4.5] w-full object-cover transition-transform duration-700 group-hover:scale-[1.04]"
           />
+          <span
+            className="absolute bottom-3 right-3 flex size-10 translate-y-2 items-center justify-center bg-background text-ink opacity-0 transition-all duration-300 group-hover:translate-y-0 group-hover:opacity-100"
+            aria-hidden="true"
+          >
+            ↗
+          </span>
         </div>
-        <div className="space-y-1.5 py-3">
-          <h3 className="line-clamp-2 font-sans text-sm font-medium leading-snug text-ink transition-colors group-hover:text-primary">
+        <div className="space-y-2 py-4">
+          <p className="text-[9px] font-bold uppercase tracking-[.15em] text-muted-foreground">
+            {product.category}
+          </p>
+          <h3 className="line-clamp-2 font-display text-[15px] font-semibold leading-snug text-ink transition-colors group-hover:text-primary">
             {product.name}
           </h3>
-          <Stars rating={product.rating} />
-          <p className="flex items-center gap-2 text-sm font-semibold text-primary">
+          <div className="flex items-center gap-2">
+            <Stars rating={product.rating} />
+            <span className="text-[10px] text-muted-foreground">{product.rating.toFixed(1)}</span>
+          </div>
+          <p className="flex items-center gap-2 pt-0.5 text-sm font-semibold text-ink">
             {product.oldPrice ? (
               <span className="text-muted-foreground line-through">
                 ${product.oldPrice.toFixed(2)}

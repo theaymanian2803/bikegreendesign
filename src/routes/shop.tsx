@@ -13,6 +13,12 @@ import { safeLoad } from "@/lib/safe-load";
 import shopBanner from "@/assets/cta-road.jpg";
 import cityRide from "@/assets/service-test.jpg";
 import trailRide from "@/assets/about-mechanic.jpg";
+import categoryBlueBike from "@/assets/cat-blue-bike.jpg";
+import categoryRedBike from "@/assets/cat-red-bike.jpg";
+import categorySnowBike from "@/assets/hero-bike-snow.jpg";
+import categoryRoadRide from "@/assets/cta-road.jpg";
+
+const categoryImages = [categoryBlueBike, categoryRedBike, categorySnowBike, categoryRoadRide];
 
 const sideMenu = ["Bicycles", "Accessories", "Apparel", "Components", "Services"];
 
@@ -24,13 +30,6 @@ const shopSearchSchema = z.object({
 
 export const Route = createFileRoute("/shop")({
   validateSearch: shopSearchSchema,
-  loader: async (): Promise<{ products: CatalogProduct[]; categories: CatalogCategory[] }> => {
-    const [products, categories] = await Promise.all([
-      safeLoad([], () => listCatalogProducts()),
-      safeLoad([], () => listCatalogCategories()),
-    ]);
-    return { products, categories };
-  },
   head: () => ({
     meta: [
       { title: "Shop Bicycles & Parts — Pathway Bike Store" },
@@ -42,25 +41,39 @@ export const Route = createFileRoute("/shop")({
       { property: "og:title", content: "Shop Bicycles & Parts — Pathway Bike Store" },
       {
         property: "og:description",
-        content: "Bikes, wheels, helmets and drivetrain parts with category and price filters.",
+        content: "Bikes, wheels, helmets and drivetrain parts with category filters.",
       },
     ],
   }),
+  loader: async (): Promise<{ products: CatalogProduct[]; categories: CatalogCategory[] }> => {
+    const [products, categories] = await Promise.all([
+      safeLoad([], () => listCatalogProducts()),
+      safeLoad([], () => listCatalogCategories()),
+    ]);
+    return { products, categories };
+  },
   component: ShopPage,
 });
 
 function ShopPage() {
   const { products, categories } = Route.useLoaderData();
-  const { category, sort } = Route.useSearch();
+  const { q, category, sort } = Route.useSearch();
   const navigate = useNavigate({ from: Route.fullPath });
 
   const visible = useMemo(() => {
     let list = filterByCategory(products, category);
+    if (q) {
+      const needle = q.toLowerCase();
+      list = list.filter(
+        (p) =>
+          p.name.toLowerCase().includes(needle) || (p.brand ?? "").toLowerCase().includes(needle),
+      );
+    }
     if (sort === "price-asc") list = [...list].sort((a, b) => a.price - b.price);
     if (sort === "price-desc") list = [...list].sort((a, b) => b.price - a.price);
     if (sort === "name-asc") list = [...list].sort((a, b) => a.name.localeCompare(b.name));
     return list;
-  }, [products, category, sort]);
+  }, [products, category, sort, q]);
 
   const brands = useMemo(
     () => Array.from(new Set(products.map((p) => p.brand).filter(Boolean))) as string[],
@@ -71,19 +84,22 @@ function ShopPage() {
     <div className="min-h-screen bg-background">
       <Header />
 
-      {/* Page banner */}
-      <section className="relative">
+      <section className="relative isolate overflow-hidden bg-secondary">
         <img
           src={shopBanner}
           alt="Road bicycle wheel close up"
           width={1920}
           height={800}
-          className="h-[160px] w-full object-cover"
+          className="absolute inset-0 size-full object-cover opacity-30 mix-blend-luminosity"
         />
-        <div className="absolute inset-0 bg-ink/70" />
-        <div className="absolute inset-0 flex flex-col items-center justify-center">
-          <h1 className="text-2xl text-ink-foreground">Shop</h1>
-          <p className="mt-1 text-xs text-ink-foreground/70">
+        <div className="absolute inset-0 bg-gradient-to-r from-secondary via-secondary/90 to-secondary/30" />
+        <div className="site-container relative flex min-h-[220px] flex-col justify-center py-10 text-secondary-foreground sm:min-h-[270px]">
+          <p className="site-eyebrow !text-accent">Ride farther. Fix less.</p>
+          <h1 className="mt-3 max-w-2xl text-4xl tracking-[-.06em] sm:text-6xl">The shop floor.</h1>
+          <p className="mt-3 max-w-xl text-sm leading-6 text-secondary-foreground/75">
+            Ride-tested bikes, parts with a purpose, and gear picked by people who use it.
+          </p>
+          <p className="mt-4 text-xs text-secondary-foreground/65">
             <Link to="/" className="hover:text-primary">
               Home
             </Link>{" "}
@@ -92,115 +108,134 @@ function ShopPage() {
         </div>
       </section>
 
-      <main className="mx-auto grid max-w-[1200px] gap-8 px-4 py-10 lg:grid-cols-[240px_1fr]">
+      <main className="site-container grid gap-8 py-10 lg:grid-cols-[230px_1fr] lg:py-14">
         {/* Sidebar */}
-        <aside className="space-y-8">
+        <aside className="order-2 space-y-8 lg:sticky lg:top-8 lg:order-1 lg:self-start">
           <div>
-            <h2 className="border-l-2 border-primary bg-surface px-3 py-2 text-sm">Home</h2>
+            <h2 className="border-b border-border pb-3 text-[11px] font-bold uppercase tracking-[.15em] text-ink">
+              Shop the range
+            </h2>
             <ul className="mt-2">
               {sideMenu.map((item) => (
                 <li
                   key={item}
-                  className="flex items-center justify-between border-b border-border py-2 text-xs text-muted-foreground"
+                  className="flex items-center justify-between border-b border-border/70 py-3 text-xs text-muted-foreground"
                 >
                   {item}
-                  <Plus className="size-3" />
+                  <Plus className="size-3 text-primary" />
                 </li>
               ))}
             </ul>
           </div>
 
           <div>
-            <h2 className="border-l-2 border-primary bg-surface px-3 py-2 text-sm">Filter By</h2>
+            <h2 className="border-b border-border pb-3 text-[11px] font-bold uppercase tracking-[.15em] text-ink">
+              Narrow your search
+            </h2>
             <div className="mt-4 space-y-6">
-              <FilterGroup title="Categories">
-                <li className="flex items-center gap-2 text-xs text-muted-foreground">
-                  <Link
-                    to="/shop"
-                    search={(prev) => ({ ...prev, category: undefined })}
-                    className={category ? "hover:text-primary" : "font-bold text-ink"}
-                  >
-                    All ({products.length})
-                  </Link>
-                </li>
-                {categories.map((c) => (
-                  <li key={c.id} className="flex items-center gap-2 text-xs text-muted-foreground">
+              <div>
+                <h3 className="text-xs font-bold uppercase tracking-wide text-ink">Categories</h3>
+                <ul className="mt-2 space-y-1.5">
+                  <li className="flex items-center gap-2 text-xs text-muted-foreground">
                     <Link
                       to="/shop"
-                      search={(prev) => ({ ...prev, category: c.slug })}
-                      className={category === c.slug ? "font-bold text-ink" : "hover:text-primary"}
+                      search={(prev) => ({ ...prev, category: undefined })}
+                      className={category ? "hover:text-primary" : "font-bold text-ink"}
                     >
-                      {c.name} ({c.count})
+                      Everything ({products.length})
                     </Link>
                   </li>
-                ))}
-              </FilterGroup>
-
-              {brands.length ? (
-                <FilterGroup title="Brands">
-                  {brands.map((brand) => (
+                  {categories.map((c) => (
                     <li
-                      key={brand}
+                      key={c.id}
                       className="flex items-center gap-2 text-xs text-muted-foreground"
                     >
-                      <input type="checkbox" className="size-3 accent-primary" readOnly />
-                      {brand}
+                      <Link
+                        to="/shop"
+                        search={(prev) => ({ ...prev, category: c.slug })}
+                        className={
+                          category === c.slug ? "font-bold text-ink" : "hover:text-primary"
+                        }
+                      >
+                        {c.name} ({c.count})
+                      </Link>
                     </li>
                   ))}
-                </FilterGroup>
+                </ul>
+              </div>
+
+              {brands.length ? (
+                <div>
+                  <h3 className="text-xs font-bold uppercase tracking-wide text-ink">Brands</h3>
+                  <ul className="mt-2 space-y-1.5">
+                    {brands.map((brand) => (
+                      <li
+                        key={brand}
+                        className="flex items-center gap-2 text-xs text-muted-foreground"
+                      >
+                        <input type="checkbox" className="size-3 accent-primary" readOnly />
+                        {brand}
+                      </li>
+                    ))}
+                  </ul>
+                </div>
               ) : null}
             </div>
           </div>
         </aside>
 
         {/* Listing */}
-        <div>
-          <p className="text-xs leading-relaxed text-muted-foreground">
-            Bicycles come in various categories, each designed for specific terrains, purposes and
-            rider preferences. Road bikes are lightweight and built for speed, ideal for paved
-            surfaces and long-distance riding. Mountain bikes, with their sturdy frames and wide
-            knobby tires, are perfect for rugged trails and off-road adventures.
+        <div className="order-1 min-w-0 lg:order-2">
+          <p className="max-w-3xl text-sm leading-7 text-muted-foreground">
+            Our shelves are edited, not endless. Find the bike for your kind of miles, then add the
+            components and kit our mechanics ride themselves.
           </p>
 
-          <h2 className="mt-8 text-sm">Subcategories</h2>
-          <div className="mt-3 grid grid-cols-2 gap-3 sm:grid-cols-4">
-            {categories.map((c) => (
-              <div key={c.name} className="text-center">
-                {c.image ? (
+          <h2 className="mt-9 text-[11px] font-bold uppercase tracking-[.15em]">
+            Find your terrain
+          </h2>
+          <div className="mt-4 grid grid-cols-2 gap-3 sm:grid-cols-4">
+            {categories.slice(0, 4).map((c, index) => (
+              <Link
+                key={c.name}
+                to="/shop"
+                search={(prev) => ({ ...prev, category: c.slug })}
+                className="group text-center"
+              >
+                <div className="relative isolate h-28 overflow-hidden border border-border bg-secondary text-left">
                   <img
-                    src={c.image}
-                    alt={c.name}
+                    src={categoryImages[index % categoryImages.length]}
+                    alt=""
                     loading="lazy"
-                    width={320}
-                    height={240}
-                    className="h-24 w-full object-cover"
+                    className="absolute inset-0 size-full object-cover transition-transform duration-500 group-hover:scale-105"
                   />
-                ) : (
-                  <div className="flex h-24 items-center justify-center border border-border bg-background text-[11px] text-muted-foreground">
-                    No image available
-                  </div>
-                )}
-                <p className="mt-2 text-xs text-ink">{c.name}</p>
-              </div>
+                  <span className="absolute inset-0 bg-gradient-to-t from-secondary/85 via-secondary/15 to-transparent" />
+                  <span className="absolute bottom-3 left-3 font-display text-xs font-semibold text-secondary-foreground">
+                    {String(c.count).padStart(2, "0")} in range
+                  </span>
+                </div>
+                <p className="mt-2 text-xs font-semibold text-ink">{c.name}</p>
+              </Link>
             ))}
           </div>
 
-          <div className="mt-8 flex flex-wrap items-center justify-between gap-3 border-y border-border py-3">
+          <div className="mt-8 flex flex-wrap items-center justify-between gap-3 border-y border-border py-4">
             <div className="flex items-center gap-2">
-              <span className="flex size-7 items-center justify-center bg-primary text-primary-foreground">
+              <span className="flex size-8 items-center justify-center bg-secondary text-secondary-foreground">
                 <Grid2x2 className="size-4" />
               </span>
-              <span className="flex size-7 items-center justify-center border border-border text-muted-foreground">
+              <span className="flex size-8 items-center justify-center border border-border text-muted-foreground">
                 <List className="size-4" />
               </span>
-              <span className="ml-3 text-xs text-muted-foreground">
-                There are {visible.length} products.
+              <span className="ml-2 text-xs text-muted-foreground">
+                {visible.length} products, picked for the ride.
               </span>
             </div>
-            <div className="flex items-center gap-2 text-xs text-muted-foreground">
+            <label className="flex items-center gap-2 text-xs text-muted-foreground">
               Sort by:
               <select
-                className="border border-border bg-background px-3 py-1.5 text-xs text-ink"
+                aria-label="Sort products"
+                className="form-control px-3 py-2 text-xs text-ink"
                 value={sort ?? "relevance"}
                 onChange={(e) =>
                   navigate({
@@ -216,7 +251,7 @@ function ShopPage() {
                 <option value="price-desc">Price, high to low</option>
                 <option value="name-asc">Name, A to Z</option>
               </select>
-            </div>
+            </label>
           </div>
 
           <div className="mt-6 grid grid-cols-2 gap-6 lg:grid-cols-3">
@@ -226,12 +261,14 @@ function ShopPage() {
           </div>
 
           {visible.length === 0 ? (
-            <p className="mt-8 text-sm text-muted-foreground">No products match this filter yet.</p>
+            <p className="mt-8 border border-border bg-surface p-6 text-sm text-muted-foreground">
+              Nothing on the shelf matches that filter yet.
+            </p>
           ) : null}
 
-          <div className="mt-8 flex items-center justify-between text-xs text-muted-foreground">
+          <div className="mt-8 flex items-center justify-between border-t border-border pt-4 text-xs text-muted-foreground">
             <span>
-              Showing 1-{Math.min(12, visible.length)} of {visible.length} item(s)
+              Showing 1–{visible.length} of {visible.length} item(s)
             </span>
             <div className="flex items-center gap-1">
               <span className="flex size-7 items-center justify-center bg-primary text-primary-foreground">
@@ -241,8 +278,8 @@ function ShopPage() {
           </div>
 
           {/* Description block */}
-          <div className="mt-12 border border-border p-6">
-            <p className="text-xs leading-relaxed text-muted-foreground">
+          <div className="mt-12 bg-surface p-5 sm:p-7">
+            <p className="max-w-3xl text-sm leading-7 text-muted-foreground">
               Hybrid bikes combine features of road and mountain bikes, offering versatility for
               both city commuting and occasional trail rides. Cruiser bikes prioritize comfort and
               style, often used for casual riding on flat terrain. Electric bikes have become
@@ -267,7 +304,7 @@ function ShopPage() {
                 className="h-[220px] w-full object-cover"
               />
             </div>
-            <ul className="mt-5 space-y-1.5 text-xs text-muted-foreground">
+            <ul className="mt-5 space-y-2 text-xs text-muted-foreground">
               <li>• The enclosed design reduces air resistance, allowing for greater speeds.</li>
               <li>• Riders sit in a reclined position, which distributes weight evenly.</li>
               <li>
@@ -281,30 +318,22 @@ function ShopPage() {
       </main>
 
       {/* Newsletter */}
-      <section className="border-t border-border py-14">
+      <section className="border-t border-border bg-card py-14">
         <div className="mx-auto max-w-[600px] px-4 text-center">
-          <span className="text-[11px] font-bold uppercase tracking-[0.25em] text-primary">
-            Our Newsletter
-          </span>
-          <h2 className="mt-3 text-2xl">Join Our Newsletter</h2>
+          <span className="site-eyebrow">Ride notes</span>
+          <h2 className="mt-3 text-3xl tracking-[-.05em]">Good things for the next ride.</h2>
           <p className="mt-2 text-xs text-muted-foreground">
-            Subscribe to our latest newsletter to get news about special discounts and upcoming
-            sales.
+            New arrivals, workshop advice and routes worth getting up early for.
           </p>
           <NewsletterForm />
+          <label className="mt-3 flex items-center justify-center gap-2 text-[11px] text-muted-foreground">
+            <input type="checkbox" className="accent-primary" />I agree to the terms and conditions
+            and the privacy policy
+          </label>
         </div>
       </section>
 
       <Footer />
-    </div>
-  );
-}
-
-function FilterGroup({ title, children }: { title: string; children: React.ReactNode }) {
-  return (
-    <div>
-      <h3 className="text-xs font-bold uppercase tracking-wide text-ink">{title}</h3>
-      <ul className="mt-2 space-y-1.5">{children}</ul>
     </div>
   );
 }
