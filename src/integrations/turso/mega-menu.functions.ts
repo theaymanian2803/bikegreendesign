@@ -76,14 +76,14 @@ export const getMegaMenuData = createServerFn({ method: "GET" })
       title: String(menu.title),
       categoriesTitle: String(menu.categories_title),
       categories: catRes.rows.map((c) => ({
-        id: Number(c.id),
+        id: String(c.id),
         label: String(c.label),
         image: String(c.image_url),
         href: String(c.href),
       })),
       productsTitle: String(menu.products_title),
       products: prodRes.rows.map((p) => ({
-        id: Number(p.id),
+        id: String(p.id),
         name: String(p.name),
         price: Number(p.price),
         oldPrice: p.old_price === null ? undefined : Number(p.old_price),
