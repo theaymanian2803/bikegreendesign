@@ -18,12 +18,15 @@ sessions; checkout requires a signed-in email or guest account.
 - Canonical onboarding/setup/preview-mode spec:
   `C:\Users\PC\Desktop\workflow\onboarding-workflow.md`. Follow its step order
   and invariants; never gate the storefront or move activation before the tour.
-- Storefront theme: warm marketplace palette (Etsy-inspired cream + terracotta
-  orange) defined once per app. Web tokens/utilities live in `src/styles.css`
-  (`:root`, `.dark`, `@theme inline`, `btn-brand`, `section-label`, `chip`,
-  `card-soft`); mobile tokens live in `mobile/lib/theme.ts` (`colors`, `radius`,
-  `shadows`). Style components through those tokens rather than hard-coded
-  colors so web and mobile stay in sync.
+- Storefront theme: cream + terracotta + deep green + pale lime, defined once per
+  app. Web tokens/utilities live in `src/styles.css` (`:root`, `.dark`,
+  `@theme inline`, `btn-brand`, `section-label`, `site-container`,
+  `site-eyebrow`, `site-section`, `admin-panel`); mobile tokens live in
+  `mobile/lib/theme.ts` (`colors`, `fonts`, `radius`, `shadows`). The mobile file
+  holds the sRGB equivalents of the web `oklch()` tokens — React Native cannot
+  parse oklch, so change both together and keep the mapping comment accurate.
+  Style components through those tokens rather than hard-coded colors so web and
+  mobile stay in sync.
 - Server-only code lives in `src/integrations/turso/` (the libSQL client and
   auth helpers) and inside `*.functions.ts` server function handlers. Load
   server-only modules lazily (`await import(...)`) inside handlers so they stay

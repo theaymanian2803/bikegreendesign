@@ -1,19 +1,58 @@
+/**
+ * Mobile design tokens — mirrors `src/styles.css` on the web.
+ *
+ * Every colour here is the sRGB equivalent of an `oklch()` token in the web
+ * theme; React Native has no oklch support, so the values are pre-converted.
+ * Web and mobile must move together: change one, change the other.
+ *
+ * | web token            | oklch                  | here |
+ * | -------------------- | ---------------------- | ---- |
+ * | --background         | 0.967 0.014 89         | background |
+ * | --surface            | 0.93 0.014 88          | surface |
+ * | --card               | 0.99 0.009 88          | card |
+ * | --border             | 0.86 0.018 88          | border |
+ * | --ink                | 0.22 0.03 154          | ink |
+ * | --muted-foreground   | 0.52 0.025 151         | muted |
+ * | --primary            | 0.56 0.13 39           | primary |
+ * | --secondary          | 0.35 0.07 157          | secondary |
+ * | --accent             | 0.9 0.045 111          | accent |
+ */
 export const colors = {
-  primary: "#F1641E",
-  primaryDark: "#D24E0F",
-  primarySoft: "#FDEBE0",
-  ink: "#2B2622",
-  background: "#FBF7F1",
-  surface: "#F4EDE4",
-  card: "#FFFFFF",
-  border: "#E9E0D5",
-  muted: "#736A60",
-  star: "#E3A008",
-  sale: "#C2410C",
-  success: "#2F855A",
-  successSoft: "#E8F4EC",
+  // Surfaces
+  background: "#F8F4EA",
+  surface: "#ECE8DE",
+  card: "#FEFCF5",
+  border: "#D6D1C4",
   white: "#FFFFFF",
-  overlay: "rgba(43,38,34,0.45)",
+  overlay: "rgba(15,31,20,0.45)",
+
+  // Text
+  ink: "#0F1F14",
+  inkForeground: "#F9F5EB",
+  muted: "#5F6D62",
+
+  // Brand — terracotta
+  primary: "#B35536",
+  primaryDark: "#9E4B30",
+  primarySoft: "#F1E3D9",
+  primaryForeground: "#FCFAF4",
+  sale: "#B35536",
+
+  // Deep green
+  secondary: "#13452B",
+  secondaryForeground: "#F9F5EB",
+  topbar: "#13452B",
+  topbarForeground: "#EFEBE0",
+
+  // Pale lime
+  accent: "#DFE1C0",
+  accentForeground: "#133922",
+
+  // Feedback
+  success: "#145B39",
+  successSoft: "#DEE3D9",
+  destructive: "#B93F33",
+  star: "#DC9E2F",
 };
 
 export const fonts = {
@@ -21,14 +60,16 @@ export const fonts = {
   medium: "DMSans_500Medium",
   semibold: "DMSans_600SemiBold",
   bold: "DMSans_700Bold",
-  display: "Quicksand_700Bold",
+  display: "SpaceGrotesk_700Bold",
+  displaySemibold: "SpaceGrotesk_600SemiBold",
 };
 
+/** The web design is near-square: a 4px base radius, not the old 12–28px set. */
 export const radius = {
-  sm: 12,
-  md: 16,
-  lg: 22,
-  xl: 28,
+  sm: 2,
+  md: 4,
+  lg: 6,
+  xl: 10,
   pill: 999,
 };
 
@@ -61,14 +102,14 @@ export const typeScale = {
 export const shadows = {
   card: {
     elevation: 2,
-    shadowColor: "#2B2622",
+    shadowColor: "#0F1F14",
     shadowOffset: { height: 3, width: 0 },
     shadowOpacity: 0.07,
     shadowRadius: 10,
   },
   floating: {
     elevation: 4,
-    shadowColor: "#2B2622",
+    shadowColor: "#0F1F14",
     shadowOffset: { height: 5, width: 0 },
     shadowOpacity: 0.12,
     shadowRadius: 14,

@@ -13,8 +13,8 @@
     "db:setup": "bun run scripts/setup-db.ts",
     "test": "vitest run",
     "test:watch": "vitest",
-    "mobile": "bun --cwd mobile run start",
-    "mobile:typecheck": "bun --cwd mobile run typecheck"
+    "mobile": "bun --cwd=./mobile run start",
+    "mobile:typecheck": "bun --cwd=./mobile run typecheck"
   },
   "dependencies": {
     "@hookform/resolvers": "^5.2.2",
