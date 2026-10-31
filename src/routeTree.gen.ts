@@ -19,6 +19,14 @@ import { Route as AuthenticatedAdminRouteRouteImport } from './routes/_authentic
 import { Route as ProductIdRouteImport } from './routes/product.$id'
 import { Route as AuthenticatedAdminIndexRouteImport } from './routes/_authenticated/admin/index'
 import { Route as AuthenticatedAdminUsersRouteImport } from './routes/_authenticated/admin/users'
+import { Route as ApiAuthGuestRouteImport } from './routes/api/auth/guest'
+import { Route as ApiAuthLoginRouteImport } from './routes/api/auth/login'
+import { Route as ApiAuthLogoutRouteImport } from './routes/api/auth/logout'
+import { Route as ApiAuthRegisterRouteImport } from './routes/api/auth/register'
+import { Route as ApiAuthSessionRouteImport } from './routes/api/auth/session'
+import { Route as ApiAuthUpgradeRouteImport } from './routes/api/auth/upgrade'
+import { Route as ApiAuthGoogleIndexRouteImport } from './routes/api/auth/google/index'
+import { Route as ApiAuthGoogleCallbackRouteImport } from './routes/api/auth/google/callback'
 
 const IndexRoute = IndexRouteImport.update({
   id: '/',
@@ -69,6 +77,46 @@ const AuthenticatedAdminUsersRoute = AuthenticatedAdminUsersRouteImport.update({
   path: '/users',
   getParentRoute: () => AuthenticatedAdminRouteRoute,
 } as any)
+const ApiAuthGuestRoute = ApiAuthGuestRouteImport.update({
+  id: '/api/auth/guest',
+  path: '/api/auth/guest',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ApiAuthLoginRoute = ApiAuthLoginRouteImport.update({
+  id: '/api/auth/login',
+  path: '/api/auth/login',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ApiAuthLogoutRoute = ApiAuthLogoutRouteImport.update({
+  id: '/api/auth/logout',
+  path: '/api/auth/logout',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ApiAuthRegisterRoute = ApiAuthRegisterRouteImport.update({
+  id: '/api/auth/register',
+  path: '/api/auth/register',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ApiAuthSessionRoute = ApiAuthSessionRouteImport.update({
+  id: '/api/auth/session',
+  path: '/api/auth/session',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ApiAuthUpgradeRoute = ApiAuthUpgradeRouteImport.update({
+  id: '/api/auth/upgrade',
+  path: '/api/auth/upgrade',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ApiAuthGoogleIndexRoute = ApiAuthGoogleIndexRouteImport.update({
+  id: '/api/auth/google/',
+  path: '/api/auth/google/',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ApiAuthGoogleCallbackRoute = ApiAuthGoogleCallbackRouteImport.update({
+  id: '/api/auth/google/callback',
+  path: '/api/auth/google/callback',
+  getParentRoute: () => rootRouteImport,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
@@ -79,7 +127,15 @@ export interface FileRoutesByFullPath {
   '/admin': typeof AuthenticatedAdminRouteRouteWithChildren
   '/product/$id': typeof ProductIdRoute
   '/admin/users': typeof AuthenticatedAdminUsersRoute
+  '/api/auth/guest': typeof ApiAuthGuestRoute
+  '/api/auth/login': typeof ApiAuthLoginRoute
+  '/api/auth/logout': typeof ApiAuthLogoutRoute
+  '/api/auth/register': typeof ApiAuthRegisterRoute
+  '/api/auth/session': typeof ApiAuthSessionRoute
+  '/api/auth/upgrade': typeof ApiAuthUpgradeRoute
   '/admin/': typeof AuthenticatedAdminIndexRoute
+  '/api/auth/google/callback': typeof ApiAuthGoogleCallbackRoute
+  '/api/auth/google/': typeof ApiAuthGoogleIndexRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
@@ -89,7 +145,15 @@ export interface FileRoutesByTo {
   '/shop': typeof ShopRoute
   '/product/$id': typeof ProductIdRoute
   '/admin/users': typeof AuthenticatedAdminUsersRoute
+  '/api/auth/guest': typeof ApiAuthGuestRoute
+  '/api/auth/login': typeof ApiAuthLoginRoute
+  '/api/auth/logout': typeof ApiAuthLogoutRoute
+  '/api/auth/register': typeof ApiAuthRegisterRoute
+  '/api/auth/session': typeof ApiAuthSessionRoute
+  '/api/auth/upgrade': typeof ApiAuthUpgradeRoute
   '/admin': typeof AuthenticatedAdminIndexRoute
+  '/api/auth/google/callback': typeof ApiAuthGoogleCallbackRoute
+  '/api/auth/google': typeof ApiAuthGoogleIndexRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -102,7 +166,15 @@ export interface FileRoutesById {
   '/_authenticated/admin': typeof AuthenticatedAdminRouteRouteWithChildren
   '/product/$id': typeof ProductIdRoute
   '/_authenticated/admin/users': typeof AuthenticatedAdminUsersRoute
+  '/api/auth/guest': typeof ApiAuthGuestRoute
+  '/api/auth/login': typeof ApiAuthLoginRoute
+  '/api/auth/logout': typeof ApiAuthLogoutRoute
+  '/api/auth/register': typeof ApiAuthRegisterRoute
+  '/api/auth/session': typeof ApiAuthSessionRoute
+  '/api/auth/upgrade': typeof ApiAuthUpgradeRoute
   '/_authenticated/admin/': typeof AuthenticatedAdminIndexRoute
+  '/api/auth/google/callback': typeof ApiAuthGoogleCallbackRoute
+  '/api/auth/google/': typeof ApiAuthGoogleIndexRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -115,7 +187,15 @@ export interface FileRouteTypes {
     | '/admin'
     | '/product/$id'
     | '/admin/users'
+    | '/api/auth/guest'
+    | '/api/auth/login'
+    | '/api/auth/logout'
+    | '/api/auth/register'
+    | '/api/auth/session'
+    | '/api/auth/upgrade'
     | '/admin/'
+    | '/api/auth/google/callback'
+    | '/api/auth/google/'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
@@ -125,7 +205,15 @@ export interface FileRouteTypes {
     | '/shop'
     | '/product/$id'
     | '/admin/users'
+    | '/api/auth/guest'
+    | '/api/auth/login'
+    | '/api/auth/logout'
+    | '/api/auth/register'
+    | '/api/auth/session'
+    | '/api/auth/upgrade'
     | '/admin'
+    | '/api/auth/google/callback'
+    | '/api/auth/google'
   id:
     | '__root__'
     | '/'
@@ -137,7 +225,15 @@ export interface FileRouteTypes {
     | '/_authenticated/admin'
     | '/product/$id'
     | '/_authenticated/admin/users'
+    | '/api/auth/guest'
+    | '/api/auth/login'
+    | '/api/auth/logout'
+    | '/api/auth/register'
+    | '/api/auth/session'
+    | '/api/auth/upgrade'
     | '/_authenticated/admin/'
+    | '/api/auth/google/callback'
+    | '/api/auth/google/'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -148,6 +244,14 @@ export interface RootRouteChildren {
   CheckoutRoute: typeof CheckoutRoute
   ShopRoute: typeof ShopRoute
   ProductIdRoute: typeof ProductIdRoute
+  ApiAuthGuestRoute: typeof ApiAuthGuestRoute
+  ApiAuthLoginRoute: typeof ApiAuthLoginRoute
+  ApiAuthLogoutRoute: typeof ApiAuthLogoutRoute
+  ApiAuthRegisterRoute: typeof ApiAuthRegisterRoute
+  ApiAuthSessionRoute: typeof ApiAuthSessionRoute
+  ApiAuthUpgradeRoute: typeof ApiAuthUpgradeRoute
+  ApiAuthGoogleCallbackRoute: typeof ApiAuthGoogleCallbackRoute
+  ApiAuthGoogleIndexRoute: typeof ApiAuthGoogleIndexRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -222,6 +326,62 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedAdminUsersRouteImport
       parentRoute: typeof AuthenticatedAdminRouteRoute
     }
+    '/api/auth/guest': {
+      id: '/api/auth/guest'
+      path: '/api/auth/guest'
+      fullPath: '/api/auth/guest'
+      preLoaderRoute: typeof ApiAuthGuestRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/auth/login': {
+      id: '/api/auth/login'
+      path: '/api/auth/login'
+      fullPath: '/api/auth/login'
+      preLoaderRoute: typeof ApiAuthLoginRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/auth/logout': {
+      id: '/api/auth/logout'
+      path: '/api/auth/logout'
+      fullPath: '/api/auth/logout'
+      preLoaderRoute: typeof ApiAuthLogoutRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/auth/register': {
+      id: '/api/auth/register'
+      path: '/api/auth/register'
+      fullPath: '/api/auth/register'
+      preLoaderRoute: typeof ApiAuthRegisterRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/auth/session': {
+      id: '/api/auth/session'
+      path: '/api/auth/session'
+      fullPath: '/api/auth/session'
+      preLoaderRoute: typeof ApiAuthSessionRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/auth/upgrade': {
+      id: '/api/auth/upgrade'
+      path: '/api/auth/upgrade'
+      fullPath: '/api/auth/upgrade'
+      preLoaderRoute: typeof ApiAuthUpgradeRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/auth/google/': {
+      id: '/api/auth/google/'
+      path: '/api/auth/google'
+      fullPath: '/api/auth/google/'
+      preLoaderRoute: typeof ApiAuthGoogleIndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/auth/google/callback': {
+      id: '/api/auth/google/callback'
+      path: '/api/auth/google/callback'
+      fullPath: '/api/auth/google/callback'
+      preLoaderRoute: typeof ApiAuthGoogleCallbackRouteImport
+      parentRoute: typeof rootRouteImport
+    }
   }
 }
 
@@ -260,7 +420,25 @@ const rootRouteChildren: RootRouteChildren = {
   CheckoutRoute: CheckoutRoute,
   ShopRoute: ShopRoute,
   ProductIdRoute: ProductIdRoute,
+  ApiAuthGuestRoute: ApiAuthGuestRoute,
+  ApiAuthLoginRoute: ApiAuthLoginRoute,
+  ApiAuthLogoutRoute: ApiAuthLogoutRoute,
+  ApiAuthRegisterRoute: ApiAuthRegisterRoute,
+  ApiAuthSessionRoute: ApiAuthSessionRoute,
+  ApiAuthUpgradeRoute: ApiAuthUpgradeRoute,
+  ApiAuthGoogleCallbackRoute: ApiAuthGoogleCallbackRoute,
+  ApiAuthGoogleIndexRoute: ApiAuthGoogleIndexRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
   ._addFileTypes<FileRouteTypes>()
+
+import type { getRouter } from './router.tsx'
+import type { startInstance } from './start.ts'
+declare module '@tanstack/react-start' {
+  interface Register {
+    ssr: true
+    router: Awaited<ReturnType<typeof getRouter>>
+    config: Awaited<ReturnType<typeof startInstance.getOptions>>
+  }
+}
