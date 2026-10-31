@@ -35,10 +35,24 @@ import { Route as ApiAuthLogoutRouteImport } from './routes/api/auth/logout'
 import { Route as ApiAuthRegisterRouteImport } from './routes/api/auth/register'
 import { Route as ApiAuthSessionRouteImport } from './routes/api/auth/session'
 import { Route as ApiAuthUpgradeRouteImport } from './routes/api/auth/upgrade'
+import { Route as ApiMobileBootstrapRouteImport } from './routes/api/mobile/bootstrap'
+import { Route as ApiMobileCategoriesRouteImport } from './routes/api/mobile/categories'
+import { Route as ApiMobileNewsletterRouteImport } from './routes/api/mobile/newsletter'
+import { Route as ApiMobileReviewsRouteImport } from './routes/api/mobile/reviews'
 import { Route as AuthenticatedAdminOrdersIndexRouteImport } from './routes/_authenticated/admin/orders/index'
 import { Route as AuthenticatedAdminOrdersOrderIdRouteImport } from './routes/_authenticated/admin/orders/$orderId'
 import { Route as ApiAuthGoogleIndexRouteImport } from './routes/api/auth/google/index'
 import { Route as ApiAuthGoogleCallbackRouteImport } from './routes/api/auth/google/callback'
+import { Route as ApiMobileAuthGuestRouteImport } from './routes/api/mobile/auth/guest'
+import { Route as ApiMobileAuthLoginRouteImport } from './routes/api/mobile/auth/login'
+import { Route as ApiMobileAuthLogoutRouteImport } from './routes/api/mobile/auth/logout'
+import { Route as ApiMobileAuthRegisterRouteImport } from './routes/api/mobile/auth/register'
+import { Route as ApiMobileAuthSessionRouteImport } from './routes/api/mobile/auth/session'
+import { Route as ApiMobileAuthUpgradeRouteImport } from './routes/api/mobile/auth/upgrade'
+import { Route as ApiMobileOrdersIndexRouteImport } from './routes/api/mobile/orders/index'
+import { Route as ApiMobileOrdersTrackRouteImport } from './routes/api/mobile/orders/track'
+import { Route as ApiMobileProductsIndexRouteImport } from './routes/api/mobile/products/index'
+import { Route as ApiMobileProductsSlugRouteImport } from './routes/api/mobile/products/$slug'
 
 const IndexRoute = IndexRouteImport.update({
   id: '/',
@@ -174,6 +188,26 @@ const ApiAuthUpgradeRoute = ApiAuthUpgradeRouteImport.update({
   path: '/api/auth/upgrade',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ApiMobileBootstrapRoute = ApiMobileBootstrapRouteImport.update({
+  id: '/api/mobile/bootstrap',
+  path: '/api/mobile/bootstrap',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ApiMobileCategoriesRoute = ApiMobileCategoriesRouteImport.update({
+  id: '/api/mobile/categories',
+  path: '/api/mobile/categories',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ApiMobileNewsletterRoute = ApiMobileNewsletterRouteImport.update({
+  id: '/api/mobile/newsletter',
+  path: '/api/mobile/newsletter',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ApiMobileReviewsRoute = ApiMobileReviewsRouteImport.update({
+  id: '/api/mobile/reviews',
+  path: '/api/mobile/reviews',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const AuthenticatedAdminOrdersIndexRoute =
   AuthenticatedAdminOrdersIndexRouteImport.update({
     id: '/orders/',
@@ -194,6 +228,56 @@ const ApiAuthGoogleIndexRoute = ApiAuthGoogleIndexRouteImport.update({
 const ApiAuthGoogleCallbackRoute = ApiAuthGoogleCallbackRouteImport.update({
   id: '/api/auth/google/callback',
   path: '/api/auth/google/callback',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ApiMobileAuthGuestRoute = ApiMobileAuthGuestRouteImport.update({
+  id: '/api/mobile/auth/guest',
+  path: '/api/mobile/auth/guest',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ApiMobileAuthLoginRoute = ApiMobileAuthLoginRouteImport.update({
+  id: '/api/mobile/auth/login',
+  path: '/api/mobile/auth/login',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ApiMobileAuthLogoutRoute = ApiMobileAuthLogoutRouteImport.update({
+  id: '/api/mobile/auth/logout',
+  path: '/api/mobile/auth/logout',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ApiMobileAuthRegisterRoute = ApiMobileAuthRegisterRouteImport.update({
+  id: '/api/mobile/auth/register',
+  path: '/api/mobile/auth/register',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ApiMobileAuthSessionRoute = ApiMobileAuthSessionRouteImport.update({
+  id: '/api/mobile/auth/session',
+  path: '/api/mobile/auth/session',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ApiMobileAuthUpgradeRoute = ApiMobileAuthUpgradeRouteImport.update({
+  id: '/api/mobile/auth/upgrade',
+  path: '/api/mobile/auth/upgrade',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ApiMobileOrdersIndexRoute = ApiMobileOrdersIndexRouteImport.update({
+  id: '/api/mobile/orders/',
+  path: '/api/mobile/orders/',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ApiMobileOrdersTrackRoute = ApiMobileOrdersTrackRouteImport.update({
+  id: '/api/mobile/orders/track',
+  path: '/api/mobile/orders/track',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ApiMobileProductsIndexRoute = ApiMobileProductsIndexRouteImport.update({
+  id: '/api/mobile/products/',
+  path: '/api/mobile/products/',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ApiMobileProductsSlugRoute = ApiMobileProductsSlugRouteImport.update({
+  id: '/api/mobile/products/$slug',
+  path: '/api/mobile/products/$slug',
   getParentRoute: () => rootRouteImport,
 } as any)
 
@@ -222,11 +306,25 @@ export interface FileRoutesByFullPath {
   '/api/auth/register': typeof ApiAuthRegisterRoute
   '/api/auth/session': typeof ApiAuthSessionRoute
   '/api/auth/upgrade': typeof ApiAuthUpgradeRoute
+  '/api/mobile/bootstrap': typeof ApiMobileBootstrapRoute
+  '/api/mobile/categories': typeof ApiMobileCategoriesRoute
+  '/api/mobile/newsletter': typeof ApiMobileNewsletterRoute
+  '/api/mobile/reviews': typeof ApiMobileReviewsRoute
   '/admin/': typeof AuthenticatedAdminIndexRoute
   '/admin/orders/$orderId': typeof AuthenticatedAdminOrdersOrderIdRoute
   '/api/auth/google/callback': typeof ApiAuthGoogleCallbackRoute
+  '/api/mobile/auth/guest': typeof ApiMobileAuthGuestRoute
+  '/api/mobile/auth/login': typeof ApiMobileAuthLoginRoute
+  '/api/mobile/auth/logout': typeof ApiMobileAuthLogoutRoute
+  '/api/mobile/auth/register': typeof ApiMobileAuthRegisterRoute
+  '/api/mobile/auth/session': typeof ApiMobileAuthSessionRoute
+  '/api/mobile/auth/upgrade': typeof ApiMobileAuthUpgradeRoute
+  '/api/mobile/orders/track': typeof ApiMobileOrdersTrackRoute
+  '/api/mobile/products/$slug': typeof ApiMobileProductsSlugRoute
   '/admin/orders/': typeof AuthenticatedAdminOrdersIndexRoute
   '/api/auth/google/': typeof ApiAuthGoogleIndexRoute
+  '/api/mobile/orders/': typeof ApiMobileOrdersIndexRoute
+  '/api/mobile/products/': typeof ApiMobileProductsIndexRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
@@ -252,11 +350,25 @@ export interface FileRoutesByTo {
   '/api/auth/register': typeof ApiAuthRegisterRoute
   '/api/auth/session': typeof ApiAuthSessionRoute
   '/api/auth/upgrade': typeof ApiAuthUpgradeRoute
+  '/api/mobile/bootstrap': typeof ApiMobileBootstrapRoute
+  '/api/mobile/categories': typeof ApiMobileCategoriesRoute
+  '/api/mobile/newsletter': typeof ApiMobileNewsletterRoute
+  '/api/mobile/reviews': typeof ApiMobileReviewsRoute
   '/admin': typeof AuthenticatedAdminIndexRoute
   '/admin/orders/$orderId': typeof AuthenticatedAdminOrdersOrderIdRoute
   '/api/auth/google/callback': typeof ApiAuthGoogleCallbackRoute
+  '/api/mobile/auth/guest': typeof ApiMobileAuthGuestRoute
+  '/api/mobile/auth/login': typeof ApiMobileAuthLoginRoute
+  '/api/mobile/auth/logout': typeof ApiMobileAuthLogoutRoute
+  '/api/mobile/auth/register': typeof ApiMobileAuthRegisterRoute
+  '/api/mobile/auth/session': typeof ApiMobileAuthSessionRoute
+  '/api/mobile/auth/upgrade': typeof ApiMobileAuthUpgradeRoute
+  '/api/mobile/orders/track': typeof ApiMobileOrdersTrackRoute
+  '/api/mobile/products/$slug': typeof ApiMobileProductsSlugRoute
   '/admin/orders': typeof AuthenticatedAdminOrdersIndexRoute
   '/api/auth/google': typeof ApiAuthGoogleIndexRoute
+  '/api/mobile/orders': typeof ApiMobileOrdersIndexRoute
+  '/api/mobile/products': typeof ApiMobileProductsIndexRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -285,11 +397,25 @@ export interface FileRoutesById {
   '/api/auth/register': typeof ApiAuthRegisterRoute
   '/api/auth/session': typeof ApiAuthSessionRoute
   '/api/auth/upgrade': typeof ApiAuthUpgradeRoute
+  '/api/mobile/bootstrap': typeof ApiMobileBootstrapRoute
+  '/api/mobile/categories': typeof ApiMobileCategoriesRoute
+  '/api/mobile/newsletter': typeof ApiMobileNewsletterRoute
+  '/api/mobile/reviews': typeof ApiMobileReviewsRoute
   '/_authenticated/admin/': typeof AuthenticatedAdminIndexRoute
   '/_authenticated/admin/orders/$orderId': typeof AuthenticatedAdminOrdersOrderIdRoute
   '/api/auth/google/callback': typeof ApiAuthGoogleCallbackRoute
+  '/api/mobile/auth/guest': typeof ApiMobileAuthGuestRoute
+  '/api/mobile/auth/login': typeof ApiMobileAuthLoginRoute
+  '/api/mobile/auth/logout': typeof ApiMobileAuthLogoutRoute
+  '/api/mobile/auth/register': typeof ApiMobileAuthRegisterRoute
+  '/api/mobile/auth/session': typeof ApiMobileAuthSessionRoute
+  '/api/mobile/auth/upgrade': typeof ApiMobileAuthUpgradeRoute
+  '/api/mobile/orders/track': typeof ApiMobileOrdersTrackRoute
+  '/api/mobile/products/$slug': typeof ApiMobileProductsSlugRoute
   '/_authenticated/admin/orders/': typeof AuthenticatedAdminOrdersIndexRoute
   '/api/auth/google/': typeof ApiAuthGoogleIndexRoute
+  '/api/mobile/orders/': typeof ApiMobileOrdersIndexRoute
+  '/api/mobile/products/': typeof ApiMobileProductsIndexRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -318,11 +444,25 @@ export interface FileRouteTypes {
     | '/api/auth/register'
     | '/api/auth/session'
     | '/api/auth/upgrade'
+    | '/api/mobile/bootstrap'
+    | '/api/mobile/categories'
+    | '/api/mobile/newsletter'
+    | '/api/mobile/reviews'
     | '/admin/'
     | '/admin/orders/$orderId'
     | '/api/auth/google/callback'
+    | '/api/mobile/auth/guest'
+    | '/api/mobile/auth/login'
+    | '/api/mobile/auth/logout'
+    | '/api/mobile/auth/register'
+    | '/api/mobile/auth/session'
+    | '/api/mobile/auth/upgrade'
+    | '/api/mobile/orders/track'
+    | '/api/mobile/products/$slug'
     | '/admin/orders/'
     | '/api/auth/google/'
+    | '/api/mobile/orders/'
+    | '/api/mobile/products/'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
@@ -348,11 +488,25 @@ export interface FileRouteTypes {
     | '/api/auth/register'
     | '/api/auth/session'
     | '/api/auth/upgrade'
+    | '/api/mobile/bootstrap'
+    | '/api/mobile/categories'
+    | '/api/mobile/newsletter'
+    | '/api/mobile/reviews'
     | '/admin'
     | '/admin/orders/$orderId'
     | '/api/auth/google/callback'
+    | '/api/mobile/auth/guest'
+    | '/api/mobile/auth/login'
+    | '/api/mobile/auth/logout'
+    | '/api/mobile/auth/register'
+    | '/api/mobile/auth/session'
+    | '/api/mobile/auth/upgrade'
+    | '/api/mobile/orders/track'
+    | '/api/mobile/products/$slug'
     | '/admin/orders'
     | '/api/auth/google'
+    | '/api/mobile/orders'
+    | '/api/mobile/products'
   id:
     | '__root__'
     | '/'
@@ -380,11 +534,25 @@ export interface FileRouteTypes {
     | '/api/auth/register'
     | '/api/auth/session'
     | '/api/auth/upgrade'
+    | '/api/mobile/bootstrap'
+    | '/api/mobile/categories'
+    | '/api/mobile/newsletter'
+    | '/api/mobile/reviews'
     | '/_authenticated/admin/'
     | '/_authenticated/admin/orders/$orderId'
     | '/api/auth/google/callback'
+    | '/api/mobile/auth/guest'
+    | '/api/mobile/auth/login'
+    | '/api/mobile/auth/logout'
+    | '/api/mobile/auth/register'
+    | '/api/mobile/auth/session'
+    | '/api/mobile/auth/upgrade'
+    | '/api/mobile/orders/track'
+    | '/api/mobile/products/$slug'
     | '/_authenticated/admin/orders/'
     | '/api/auth/google/'
+    | '/api/mobile/orders/'
+    | '/api/mobile/products/'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -403,8 +571,22 @@ export interface RootRouteChildren {
   ApiAuthRegisterRoute: typeof ApiAuthRegisterRoute
   ApiAuthSessionRoute: typeof ApiAuthSessionRoute
   ApiAuthUpgradeRoute: typeof ApiAuthUpgradeRoute
+  ApiMobileBootstrapRoute: typeof ApiMobileBootstrapRoute
+  ApiMobileCategoriesRoute: typeof ApiMobileCategoriesRoute
+  ApiMobileNewsletterRoute: typeof ApiMobileNewsletterRoute
+  ApiMobileReviewsRoute: typeof ApiMobileReviewsRoute
   ApiAuthGoogleCallbackRoute: typeof ApiAuthGoogleCallbackRoute
+  ApiMobileAuthGuestRoute: typeof ApiMobileAuthGuestRoute
+  ApiMobileAuthLoginRoute: typeof ApiMobileAuthLoginRoute
+  ApiMobileAuthLogoutRoute: typeof ApiMobileAuthLogoutRoute
+  ApiMobileAuthRegisterRoute: typeof ApiMobileAuthRegisterRoute
+  ApiMobileAuthSessionRoute: typeof ApiMobileAuthSessionRoute
+  ApiMobileAuthUpgradeRoute: typeof ApiMobileAuthUpgradeRoute
+  ApiMobileOrdersTrackRoute: typeof ApiMobileOrdersTrackRoute
+  ApiMobileProductsSlugRoute: typeof ApiMobileProductsSlugRoute
   ApiAuthGoogleIndexRoute: typeof ApiAuthGoogleIndexRoute
+  ApiMobileOrdersIndexRoute: typeof ApiMobileOrdersIndexRoute
+  ApiMobileProductsIndexRoute: typeof ApiMobileProductsIndexRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -591,6 +773,34 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ApiAuthUpgradeRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/api/mobile/bootstrap': {
+      id: '/api/mobile/bootstrap'
+      path: '/api/mobile/bootstrap'
+      fullPath: '/api/mobile/bootstrap'
+      preLoaderRoute: typeof ApiMobileBootstrapRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/mobile/categories': {
+      id: '/api/mobile/categories'
+      path: '/api/mobile/categories'
+      fullPath: '/api/mobile/categories'
+      preLoaderRoute: typeof ApiMobileCategoriesRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/mobile/newsletter': {
+      id: '/api/mobile/newsletter'
+      path: '/api/mobile/newsletter'
+      fullPath: '/api/mobile/newsletter'
+      preLoaderRoute: typeof ApiMobileNewsletterRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/mobile/reviews': {
+      id: '/api/mobile/reviews'
+      path: '/api/mobile/reviews'
+      fullPath: '/api/mobile/reviews'
+      preLoaderRoute: typeof ApiMobileReviewsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/_authenticated/admin/orders/': {
       id: '/_authenticated/admin/orders/'
       path: '/orders'
@@ -617,6 +827,76 @@ declare module '@tanstack/react-router' {
       path: '/api/auth/google/callback'
       fullPath: '/api/auth/google/callback'
       preLoaderRoute: typeof ApiAuthGoogleCallbackRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/mobile/auth/guest': {
+      id: '/api/mobile/auth/guest'
+      path: '/api/mobile/auth/guest'
+      fullPath: '/api/mobile/auth/guest'
+      preLoaderRoute: typeof ApiMobileAuthGuestRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/mobile/auth/login': {
+      id: '/api/mobile/auth/login'
+      path: '/api/mobile/auth/login'
+      fullPath: '/api/mobile/auth/login'
+      preLoaderRoute: typeof ApiMobileAuthLoginRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/mobile/auth/logout': {
+      id: '/api/mobile/auth/logout'
+      path: '/api/mobile/auth/logout'
+      fullPath: '/api/mobile/auth/logout'
+      preLoaderRoute: typeof ApiMobileAuthLogoutRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/mobile/auth/register': {
+      id: '/api/mobile/auth/register'
+      path: '/api/mobile/auth/register'
+      fullPath: '/api/mobile/auth/register'
+      preLoaderRoute: typeof ApiMobileAuthRegisterRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/mobile/auth/session': {
+      id: '/api/mobile/auth/session'
+      path: '/api/mobile/auth/session'
+      fullPath: '/api/mobile/auth/session'
+      preLoaderRoute: typeof ApiMobileAuthSessionRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/mobile/auth/upgrade': {
+      id: '/api/mobile/auth/upgrade'
+      path: '/api/mobile/auth/upgrade'
+      fullPath: '/api/mobile/auth/upgrade'
+      preLoaderRoute: typeof ApiMobileAuthUpgradeRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/mobile/orders/': {
+      id: '/api/mobile/orders/'
+      path: '/api/mobile/orders'
+      fullPath: '/api/mobile/orders/'
+      preLoaderRoute: typeof ApiMobileOrdersIndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/mobile/orders/track': {
+      id: '/api/mobile/orders/track'
+      path: '/api/mobile/orders/track'
+      fullPath: '/api/mobile/orders/track'
+      preLoaderRoute: typeof ApiMobileOrdersTrackRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/mobile/products/': {
+      id: '/api/mobile/products/'
+      path: '/api/mobile/products'
+      fullPath: '/api/mobile/products/'
+      preLoaderRoute: typeof ApiMobileProductsIndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/mobile/products/$slug': {
+      id: '/api/mobile/products/$slug'
+      path: '/api/mobile/products/$slug'
+      fullPath: '/api/mobile/products/$slug'
+      preLoaderRoute: typeof ApiMobileProductsSlugRouteImport
       parentRoute: typeof rootRouteImport
     }
   }
@@ -685,8 +965,22 @@ const rootRouteChildren: RootRouteChildren = {
   ApiAuthRegisterRoute: ApiAuthRegisterRoute,
   ApiAuthSessionRoute: ApiAuthSessionRoute,
   ApiAuthUpgradeRoute: ApiAuthUpgradeRoute,
+  ApiMobileBootstrapRoute: ApiMobileBootstrapRoute,
+  ApiMobileCategoriesRoute: ApiMobileCategoriesRoute,
+  ApiMobileNewsletterRoute: ApiMobileNewsletterRoute,
+  ApiMobileReviewsRoute: ApiMobileReviewsRoute,
   ApiAuthGoogleCallbackRoute: ApiAuthGoogleCallbackRoute,
+  ApiMobileAuthGuestRoute: ApiMobileAuthGuestRoute,
+  ApiMobileAuthLoginRoute: ApiMobileAuthLoginRoute,
+  ApiMobileAuthLogoutRoute: ApiMobileAuthLogoutRoute,
+  ApiMobileAuthRegisterRoute: ApiMobileAuthRegisterRoute,
+  ApiMobileAuthSessionRoute: ApiMobileAuthSessionRoute,
+  ApiMobileAuthUpgradeRoute: ApiMobileAuthUpgradeRoute,
+  ApiMobileOrdersTrackRoute: ApiMobileOrdersTrackRoute,
+  ApiMobileProductsSlugRoute: ApiMobileProductsSlugRoute,
   ApiAuthGoogleIndexRoute: ApiAuthGoogleIndexRoute,
+  ApiMobileOrdersIndexRoute: ApiMobileOrdersIndexRoute,
+  ApiMobileProductsIndexRoute: ApiMobileProductsIndexRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
