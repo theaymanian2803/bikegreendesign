@@ -1341,7 +1341,11 @@ function HomeSourceCard() {
     try {
       await setHomeSource({ data: { homeSource: next } });
       setSource(next);
-      toast.success(next === "cms" ? "Homepage now renders these sections" : "Homepage restored to the designed page");
+      toast.success(
+        next === "cms"
+          ? "Homepage now renders these sections"
+          : "Homepage restored to the designed page",
+      );
     } catch (error) {
       toast.error(error instanceof Error ? error.message : "Could not change the homepage");
     }

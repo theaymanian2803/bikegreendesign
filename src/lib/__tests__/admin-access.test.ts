@@ -5,7 +5,9 @@ import { decideAdminAccess } from "../admin-access";
 describe("decideAdminAccess", () => {
   it("forbids a non-admin regardless of method or licence", () => {
     expect(decideAdminAccess({ isAdmin: false, method: "GET", licensed: true })).toBe("forbidden");
-    expect(decideAdminAccess({ isAdmin: false, method: "POST", licensed: false })).toBe("forbidden");
+    expect(decideAdminAccess({ isAdmin: false, method: "POST", licensed: false })).toBe(
+      "forbidden",
+    );
   });
 
   it("allows an admin to read without a licence", () => {

@@ -249,7 +249,11 @@ function AdminPage() {
           <section className="rounded-lg border border-border p-6">
             <h2 className="font-display text-lg font-bold text-ink">Menu settings</h2>
             <div className="mt-4 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-              <Field label="Nav label" value={menu.title} onChange={(v) => patchMenu({ title: v })} />
+              <Field
+                label="Nav label"
+                value={menu.title}
+                onChange={(v) => patchMenu({ title: v })}
+              />
               <Field
                 label="Categories heading"
                 value={menu.categories_title}
@@ -294,7 +298,10 @@ function AdminPage() {
             </div>
             <div className="mt-4 space-y-4">
               {categories.map((c, i) => (
-                <div key={c.id} className="flex flex-wrap items-start gap-4 rounded border border-border p-4">
+                <div
+                  key={c.id}
+                  className="flex flex-wrap items-start gap-4 rounded border border-border p-4"
+                >
                   <Thumb src={c.image_url} />
                   <div className="grid min-w-0 flex-1 gap-3 sm:grid-cols-3">
                     <Field
@@ -346,14 +353,19 @@ function AdminPage() {
             </div>
             <div className="mt-4 space-y-4">
               {products.map((p, i) => (
-                <div key={p.id} className="flex flex-wrap items-start gap-4 rounded border border-border p-4">
+                <div
+                  key={p.id}
+                  className="flex flex-wrap items-start gap-4 rounded border border-border p-4"
+                >
                   <Thumb src={p.image_url} />
                   <div className="grid min-w-0 flex-1 gap-3 sm:grid-cols-3">
                     <Field
                       label="Name"
                       value={p.name}
                       onChange={(v) =>
-                        setProducts((prev) => prev.map((x, xi) => (xi === i ? { ...x, name: v } : x)))
+                        setProducts((prev) =>
+                          prev.map((x, xi) => (xi === i ? { ...x, name: v } : x)),
+                        )
                       }
                     />
                     <Field
@@ -382,7 +394,9 @@ function AdminPage() {
                       placeholder="-10%"
                       onChange={(v) =>
                         setProducts((prev) =>
-                          prev.map((x, xi) => (xi === i ? { ...x, badge: v === "" ? null : v } : x)),
+                          prev.map((x, xi) =>
+                            xi === i ? { ...x, badge: v === "" ? null : v } : x,
+                          ),
                         )
                       }
                     />
@@ -401,7 +415,9 @@ function AdminPage() {
                       value={p.href}
                       placeholder="/shop"
                       onChange={(v) =>
-                        setProducts((prev) => prev.map((x, xi) => (xi === i ? { ...x, href: v } : x)))
+                        setProducts((prev) =>
+                          prev.map((x, xi) => (xi === i ? { ...x, href: v } : x)),
+                        )
                       }
                     />
                   </div>

@@ -83,21 +83,21 @@ Only Supabase is removed.
 The redesigned storefront keeps its markup, class names and layout. Each screen
 gains a loader or a server call and keeps its JSX:
 
-| File | Change |
-|---|---|
-| `routes/index.tsx` | Renders the finished design by default, with products and reviews from the database; renders the ported landing sections when `home_source = "cms"` |
-| `routes/shop.tsx` | `listCatalogProducts` / `listCatalogCategories`; the redesigned grid and filters stay; search, category and sort use the ported search schema |
-| `routes/product.$id.tsx` | `getCatalogProduct` (slug-keyed, same URL shape), real reviews in place of the two hardcoded quotes, real rating and count |
-| `routes/cart.tsx` | Cart lines reference database products and prices |
-| `routes/checkout.tsx` | `placeOrder` instead of the fake `PW-` id; auth-gated, with guest checkout |
-| `routes/auth.tsx` | Rebuilt in the target's design: email/password, Google, guest, `?redirect=` |
-| `routes/favorites.tsx` | Built in the target's design over the ported favorites store |
-| `components/site/Header.tsx` | Account menu, cart count, favorites link, top-bar settings |
-| `components/site/Footer.tsx` | Newsletter posts to `subscribeNewsletter` |
-| `components/site/MegaMenu.tsx` | `getMegaMenuData` instead of `src/data/mega-menu.ts` |
-| `components/site/ProductCard.tsx` | Takes `CatalogProduct`; markup unchanged |
-| `components/site/PromoPopup.tsx` | Ported; mounted in the root layout |
-| `_authenticated/admin/index.tsx` | Becomes the source's dashboard; the current mega-menu editor UI is moved to `admin/menu.tsx` and rewired to the mega-menu functions, so that screen is not lost |
+| File                              | Change                                                                                                                                                          |
+| --------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `routes/index.tsx`                | Renders the finished design by default, with products and reviews from the database; renders the ported landing sections when `home_source = "cms"`             |
+| `routes/shop.tsx`                 | `listCatalogProducts` / `listCatalogCategories`; the redesigned grid and filters stay; search, category and sort use the ported search schema                   |
+| `routes/product.$id.tsx`          | `getCatalogProduct` (slug-keyed, same URL shape), real reviews in place of the two hardcoded quotes, real rating and count                                      |
+| `routes/cart.tsx`                 | Cart lines reference database products and prices                                                                                                               |
+| `routes/checkout.tsx`             | `placeOrder` instead of the fake `PW-` id; auth-gated, with guest checkout                                                                                      |
+| `routes/auth.tsx`                 | Rebuilt in the target's design: email/password, Google, guest, `?redirect=`                                                                                     |
+| `routes/favorites.tsx`            | Built in the target's design over the ported favorites store                                                                                                    |
+| `components/site/Header.tsx`      | Account menu, cart count, favorites link, top-bar settings                                                                                                      |
+| `components/site/Footer.tsx`      | Newsletter posts to `subscribeNewsletter`                                                                                                                       |
+| `components/site/MegaMenu.tsx`    | `getMegaMenuData` instead of `src/data/mega-menu.ts`                                                                                                            |
+| `components/site/ProductCard.tsx` | Takes `CatalogProduct`; markup unchanged                                                                                                                        |
+| `components/site/PromoPopup.tsx`  | Ported; mounted in the root layout                                                                                                                              |
+| `_authenticated/admin/index.tsx`  | Becomes the source's dashboard; the current mega-menu editor UI is moved to `admin/menu.tsx` and rewired to the mega-menu functions, so that screen is not lost |
 
 `src/data/products.ts` and `src/data/mega-menu.ts` are deleted once nothing
 imports them. The static catalog and `db/seed.sql` are the same 12 products with

@@ -6,10 +6,7 @@ import { Header } from "@/components/site/Header";
 import { Footer } from "@/components/site/Footer";
 import { ProductCard } from "@/components/site/ProductCard";
 import { NewsletterForm } from "@/components/site/NewsletterForm";
-import {
-  listCatalogCategories,
-  listCatalogProducts,
-} from "@/integrations/turso/catalog.functions";
+import { listCatalogCategories, listCatalogProducts } from "@/integrations/turso/catalog.functions";
 import type { CatalogCategory, CatalogProduct } from "@/lib/catalog";
 import shopBanner from "@/assets/cta-road.jpg";
 import cityRide from "@/assets/service-test.jpg";
@@ -126,16 +123,11 @@ function ShopPage() {
                   </Link>
                 </li>
                 {categories.map((c) => (
-                  <li
-                    key={c.id}
-                    className="flex items-center gap-2 text-xs text-muted-foreground"
-                  >
+                  <li key={c.id} className="flex items-center gap-2 text-xs text-muted-foreground">
                     <Link
                       to="/shop"
                       search={(prev) => ({ ...prev, category: c.slug })}
-                      className={
-                        category === c.slug ? "font-bold text-ink" : "hover:text-primary"
-                      }
+                      className={category === c.slug ? "font-bold text-ink" : "hover:text-primary"}
                     >
                       {c.name} ({c.count})
                     </Link>
@@ -146,7 +138,10 @@ function ShopPage() {
               {brands.length ? (
                 <FilterGroup title="Brands">
                   {brands.map((brand) => (
-                    <li key={brand} className="flex items-center gap-2 text-xs text-muted-foreground">
+                    <li
+                      key={brand}
+                      className="flex items-center gap-2 text-xs text-muted-foreground"
+                    >
                       <input type="checkbox" className="size-3 accent-primary" readOnly />
                       {brand}
                     </li>
@@ -230,9 +225,7 @@ function ShopPage() {
           </div>
 
           {visible.length === 0 ? (
-            <p className="mt-8 text-sm text-muted-foreground">
-              No products match this filter yet.
-            </p>
+            <p className="mt-8 text-sm text-muted-foreground">No products match this filter yet.</p>
           ) : null}
 
           <div className="mt-8 flex items-center justify-between text-xs text-muted-foreground">
@@ -276,7 +269,9 @@ function ShopPage() {
             <ul className="mt-5 space-y-1.5 text-xs text-muted-foreground">
               <li>• The enclosed design reduces air resistance, allowing for greater speeds.</li>
               <li>• Riders sit in a reclined position, which distributes weight evenly.</li>
-              <li>• They often include storage space, lighting and suspension for smooth travel.</li>
+              <li>
+                • They often include storage space, lighting and suspension for smooth travel.
+              </li>
               <li>• Some velomobiles are pedal-only, while others come with electric-assist.</li>
               <li>• Though heavier than standard bikes, they are popular among commuters.</li>
             </ul>

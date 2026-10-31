@@ -36,9 +36,11 @@
 ### Task 1: Local branch and baseline
 
 **Files:**
+
 - Modify: none (git state only)
 
 **Interfaces:**
+
 - Produces: branch `port-turso-backend` containing the design doc; `main` untouched and no remote refs updated.
 
 - [ ] **Step 1: Confirm the working tree state**
@@ -66,11 +68,13 @@ Expected: branch line reads `port-turso-backend`; `remote -v` output unchanged f
 ### Task 2: Dependencies, env and build config
 
 **Files:**
+
 - Modify: `package.json`, `vite.config.ts`, `bunfig.toml`, `.prettierrc`, `.gitignore`, `AGENTS.md`
 - Create: `.env.example`, `vitest.config.ts`
 - Copy: `$SRC/vitest.config.ts`, `$SRC/.env.example`
 
 **Interfaces:**
+
 - Produces: `bun run db:setup`, `bun run test`, `bun run test:watch` scripts; a Vite config that builds the SSR bundle for Nitro/Cloudflare with `@libsql/client` server-side.
 
 - [ ] **Step 1: Add the server dependencies**
@@ -122,11 +126,13 @@ git commit -m "build: add turso, jose and vitest; drop lovable vite config; untr
 ### Task 3: Database layer and schema
 
 **Files:**
+
 - Copy: `$SRC/db/` → `db/`, `$SRC/scripts/setup-db.ts` → `scripts/setup-db.ts`
 - Copy: `$SRC/src/integrations/turso/{client.ts,types.ts,db-config.server.ts,auth.server.ts,auth.ts,password.server.ts,email-auth.server.ts}`
 - Create: `scripts/probe-db.ts` (throwaway, deleted at the end of the task)
 
 **Interfaces:**
+
 - Produces: `getTurso(): Client`, `getBootstrapTurso(): Client`, `refreshDbConfig(force?: boolean): Promise<void>`, `readDbConfig()`, `currentDbConfig()`, `setRuntimeDbConfig(config)`, `getSessionUser` cookie helpers in `auth.server.ts`, `assertPassword`/`hashPassword` in `password.server.ts`, `requireAuth` middleware in `auth.ts`.
 
 - [ ] **Step 1: Copy the database files and server modules**
@@ -170,11 +176,13 @@ git commit -m "feat: add turso schema, migrations and server data layer"
 ### Task 4: Server functions and ported unit tests
 
 **Files:**
+
 - Copy: `$SRC/src/lib/{admin,auth,dashboard,orders,settings,setup,topbar,newsletter,license}.functions.ts`, `$SRC/src/lib/{catalog,money,landing,license-token,onboarding,demo-banner,storefront-nav,error-capture,error-page,utils}.ts`, `$SRC/src/lib/{cart,favorites}.tsx`
 - Copy: `$SRC/src/integrations/turso/{catalog,mega-menu,reviews,landing}.functions.ts`, `$SRC/src/integrations/turso/{admin-guard.server,license.server,demo-admin.server,mobile-api.server}.ts`
 - Copy: `$SRC/src/lib/__tests__/` in full
 
 **Interfaces:**
+
 - Consumes: `requireAuth` (Task 3), `getTurso()` (Task 3).
 - Produces: every server function the admin and storefront call — `listCatalogProducts(): Promise<CatalogProduct[]>`, `getCatalogProduct({ data: slug })`, `loadCatalogAdmin()`, `createProduct`, `updateProduct`, `deleteProduct`, `createCategory`, `updateCategory`, `deleteCategory`, `listOrders`, `getOrder`, `placeOrder`, `updateOrderStatus`, `listProductReviews`, `createReview`, `setReviewStatus`, `getLandingSections`, `getLandingAdmin`, `createLandingSection`, `updateLandingSection`, `moveLandingSection`, `savePromoPopup`, `getMegaMenuData`, `loadMegaMenuAdmin`, `saveMegaMenu`, `getSettings`, `saveSettings`, `getDashboardStats`, `assertAdminAccess(userId: number): Promise<void>`.
 
@@ -209,9 +217,11 @@ git commit -m "feat: port server functions, admin guard and unit tests"
 ### Task 5: Auth API routes
 
 **Files:**
+
 - Copy: `$SRC/src/routes/api/auth/` in full (eight route files)
 
 **Interfaces:**
+
 - Consumes: `auth.server.ts`, `password.server.ts`, `email-auth.server.ts` (Task 3); `auth.functions.ts` (Task 4).
 - Produces: `GET /api/auth/google`, `GET /api/auth/google/callback`, `POST /api/auth/{login,register,guest,logout}`, `GET /api/auth/session`, `POST /api/auth/upgrade`.
 
@@ -251,12 +261,14 @@ git commit -m "feat: port cookie auth api routes"
 ### Task 6: Start middleware, license and onboarding
 
 **Files:**
+
 - Copy: `$SRC/src/start.ts` → `src/start.ts`, `$SRC/src/server.ts` → `src/server.ts`
 - Copy: `$SRC/src/hooks/{use-session-user,use-mobile,use-license,use-admin-write-guard}.tsx`
 - Copy: `$SRC/src/components/site/{DemoBanner,PromoPopup}.tsx`, `$SRC/src/components/onboarding/OnboardingDialog.tsx`
 - Modify: `src/routes/__root.tsx`, `src/routes/activate.tsx` (new), `src/router.tsx`
 
 **Interfaces:**
+
 - Consumes: `getLicenseStatus`, `activateLicense`, `heartbeatLicense` (Task 4).
 - Produces: request pipeline `[errorMiddleware, dbConfigMiddleware, csrfMiddleware]`; `useLicense()` returning `{ licensed, loading, refresh }`; root layout wrapping `<Outlet />` in `QueryClientProvider`, `CartProvider`, `FavoritesProvider`, `DemoBanner`, `OnboardingDialog`, `Toaster`, `PromoPopup`.
 
@@ -294,6 +306,7 @@ git commit -m "feat: port request pipeline, license gate and onboarding shell"
 ### Task 7: Admin screens
 
 **Files:**
+
 - Copy: `$SRC/src/routes/_authenticated/route.tsx`
 - Copy: `$SRC/src/routes/_authenticated/admin/{route,orders/index,orders/$orderId,products,categories,reviews,users,settings,landing,popup,setup}.tsx`
 - Copy: `$SRC/src/components/admin/{ProductForm,ImageField,order-status}.tsx`
@@ -301,6 +314,7 @@ git commit -m "feat: port request pipeline, license gate and onboarding shell"
 - Modify: `src/routes/routeTree.gen.ts` (regenerated)
 
 **Interfaces:**
+
 - Consumes: all admin server functions (Task 4), `getSessionUser` (Task 4).
 - Produces: admin routes at `/admin`, `/admin/orders`, `/admin/orders/$orderId`, `/admin/products`, `/admin/categories`, `/admin/reviews`, `/admin/users`, `/admin/settings`, `/admin/landing`, `/admin/popup`, `/admin/setup`.
 
@@ -341,10 +355,12 @@ git commit -m "feat: port admin screens and gate"
 ### Task 8: Mega-menu admin screen
 
 **Files:**
+
 - Create: `src/routes/_authenticated/admin/menu.tsx`
 - Modify: `src/routes/_authenticated/admin/route.tsx` (navigation entry)
 
 **Interfaces:**
+
 - Consumes: `loadMegaMenuAdmin()`, `saveMegaMenu`, `addMegaMenuCategory`, `addMegaMenuProduct`, `removeMegaMenuCategory`, `removeMegaMenuProduct` (Task 4).
 - Produces: `/admin/menu`.
 
@@ -375,10 +391,12 @@ git commit -m "feat: restore mega menu editor on turso"
 ### Task 9: Remove Supabase
 
 **Files:**
+
 - Delete: `supabase/`, `src/integrations/supabase/`, `src/routes/auth.tsx` (Supabase version — replaced in Task 11)
 - Modify: `.env`, `.env.example`, `package.json`, `src/lib/lovable-error-reporting.ts` (delete if unused)
 
 **Interfaces:**
+
 - Produces: a tree where no Supabase import, dependency, env var or migration exists.
 
 - [ ] **Step 1: Delete the files and the dependency**
@@ -413,10 +431,12 @@ git commit -m "chore: remove supabase entirely"
 ### Task 10: Storefront wiring — catalog surfaces
 
 **Files:**
+
 - Modify: `src/routes/shop.tsx`, `src/routes/product.$id.tsx`, `src/components/site/{ProductCard,MegaMenu,Header,Footer}.tsx`
 - Delete: `src/data/products.ts`, `src/data/mega-menu.ts`
 
 **Interfaces:**
+
 - Consumes: `listCatalogProducts`, `listCatalogCategories`, `getCatalogProduct`, `listProductReviews`, `createReview`, `getMegaMenuData`, `getTopBarSettings`, `subscribeNewsletter` (Task 4).
 - Produces: `ProductCard({ product }: { product: CatalogProduct })` — same classes, new prop type.
 
@@ -465,10 +485,12 @@ git commit -m "feat: wire shop, product, header, footer and mega menu to turso"
 ### Task 11: Storefront wiring — cart, checkout, auth, favorites
 
 **Files:**
+
 - Modify: `src/routes/cart.tsx`, `src/routes/checkout.tsx`
 - Create: `src/routes/auth.tsx` (rebuilt in the target's design), `src/routes/favorites.tsx`
 
 **Interfaces:**
+
 - Consumes: `placeOrder`, `getSessionUser`, `logout`, `getSettings` (Task 4); `useCart`, `useFavorites` (Task 4).
 - Produces: `placeOrder({ data: { firstName, lastName, email, phone, address, city, postcode, country, notes?, items: { name, price, qty }[] } })` returning `{ publicId, email, total }` where `total` is in major units.
 
@@ -509,11 +531,13 @@ git commit -m "feat: real checkout, auth and favorites on the redesigned storefr
 ### Task 12: Homepage and landing-source switch
 
 **Files:**
+
 - Modify: `src/routes/index.tsx`, `src/lib/settings.functions.ts` (add `home_source`), `src/routes/_authenticated/admin/landing.tsx` (add the switch)
 - Create: `src/components/site/HomeStatic.tsx`
 - Copy: `$SRC/src/components/site/landing/landing-sections.tsx`
 
 **Interfaces:**
+
 - Consumes: `getLandingSections`, `getPromoPopup`, `getSettings`, `listCatalogProducts`, `listApprovedReviews` (Task 4).
 - Produces: `home_source: "static" | "cms"` in `settings`, defaulting to `"static"` when unset.
 
@@ -554,10 +578,12 @@ git commit -m "feat: homepage renders current design by default, landing cms beh
 ### Task 13: Mobile app and mobile API
 
 **Files:**
+
 - Copy: `$SRC/mobile/` in full, `$SRC/src/routes/api/mobile/` in full
 - Modify: `package.json` (mobile scripts, already added in Task 2)
 
 **Interfaces:**
+
 - Consumes: `mobile-api.server.ts` (Task 4), the `/api/mobile/auth/*` routes.
 - Produces: `bun run mobile`, `bun run mobile:typecheck`.
 
@@ -592,9 +618,11 @@ git commit -m "feat: port expo app and mobile api"
 ### Task 14: Final verification
 
 **Files:**
+
 - Modify: none (verification only)
 
 **Interfaces:**
+
 - Consumes: everything above.
 
 - [ ] **Step 1: Lint, test and build**

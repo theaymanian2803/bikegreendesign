@@ -16,14 +16,7 @@ const columns = [
   },
   {
     title: "Your Account",
-    links: [
-      "Order Tracking",
-      "Sign In",
-      "Create Account",
-      "Discount",
-      "Wishlist",
-      "Credit Slips",
-    ],
+    links: ["Order Tracking", "Sign In", "Create Account", "Discount", "Wishlist", "Credit Slips"],
   },
 ];
 

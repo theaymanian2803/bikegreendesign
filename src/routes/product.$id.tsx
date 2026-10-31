@@ -15,7 +15,6 @@ import {
   type ProductReviews,
 } from "@/integrations/turso/reviews.functions";
 
-
 export const Route = createFileRoute("/product/$id")({
   loader: async ({ params }) => {
     const data = await getCatalogProduct({ data: params.id });
@@ -25,7 +24,9 @@ export const Route = createFileRoute("/product/$id")({
   },
   head: ({ loaderData }) => {
     if (!loaderData) {
-      return { meta: [{ title: "Product not found — Pathway" }, { name: "robots", content: "noindex" }] };
+      return {
+        meta: [{ title: "Product not found — Pathway" }, { name: "robots", content: "noindex" }],
+      };
     }
     const { product } = loaderData;
     const title = `${product.name} — Pathway Bike Shop`;
@@ -51,7 +52,9 @@ function Stars({ rating }: { rating: number }) {
       {Array.from({ length: 5 }).map((_, i) => (
         <Star
           key={i}
-          className={i < rating ? "size-3.5 fill-star text-star" : "size-3.5 fill-border text-border"}
+          className={
+            i < rating ? "size-3.5 fill-star text-star" : "size-3.5 fill-border text-border"
+          }
         />
       ))}
     </div>
@@ -105,7 +108,6 @@ function ProductDetail() {
     setAdded(true);
     window.setTimeout(() => setAdded(false), 2000);
   };
-
 
   return (
     <div className="min-h-screen bg-background">
@@ -271,7 +273,6 @@ function ProductDetail() {
               >
                 <Heart className={`size-4 ${favorited ? "fill-primary" : ""}`} />
               </button>
-
             </div>
 
             <div className="mt-7 grid gap-3 border-t border-border pt-5 sm:grid-cols-3">
@@ -280,7 +281,10 @@ function ProductDetail() {
                 { icon: RotateCcw, label: "30 day easy returns" },
                 { icon: ShieldCheck, label: "2 year warranty" },
               ].map(({ icon: Icon, label }) => (
-                <div key={label} className="flex items-center gap-2 text-[11px] text-muted-foreground">
+                <div
+                  key={label}
+                  className="flex items-center gap-2 text-[11px] text-muted-foreground"
+                >
                   <Icon className="size-4 text-primary" />
                   {label}
                 </div>
@@ -313,10 +317,10 @@ function ProductDetail() {
               <div className="max-w-[820px] space-y-4 text-xs leading-relaxed text-muted-foreground">
                 <p>{product.description}</p>
                 <p>
-                  Our mechanics ride the same components we sell, so every part on this page has been
-                  tested on local roads and trails before it reaches the shelf. Bring your bike into
-                  the Pathway workshop and we will fit it, torque it to spec and take it out for a
-                  quick shakedown ride — free with any purchase over $150.
+                  Our mechanics ride the same components we sell, so every part on this page has
+                  been tested on local roads and trails before it reaches the shelf. Bring your bike
+                  into the Pathway workshop and we will fit it, torque it to spec and take it out
+                  for a quick shakedown ride — free with any purchase over $150.
                 </p>
               </div>
             ) : null}
@@ -395,7 +399,7 @@ function ReviewForm({
     setBusy(true);
     try {
       await createReview({ data: { productSlug, author, rating, title, body } });
-      toast.success("Thanks � your review is waiting for approval.");
+      toast.success("Thanks � your review is waiting for approval.");
       setAuthor("");
       setTitle("");
       setBody("");
@@ -445,7 +449,7 @@ function ReviewForm({
         className="mt-3 w-full border border-border bg-background px-3 py-2 text-xs outline-none focus:border-primary"
       />
       <button type="submit" disabled={busy} className="btn-brand mt-3">
-        {busy ? "Sending�" : "Submit review"}
+        {busy ? "Sending�" : "Submit review"}
       </button>
     </form>
   );

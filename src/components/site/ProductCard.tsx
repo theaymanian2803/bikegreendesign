@@ -9,9 +9,7 @@ function Stars({ rating }: { rating: number }) {
       {Array.from({ length: 5 }).map((_, i) => (
         <Star
           key={i}
-          className={
-            i < rating ? "size-3 fill-star text-star" : "size-3 fill-border text-border"
-          }
+          className={i < rating ? "size-3 fill-star text-star" : "size-3 fill-border text-border"}
         />
       ))}
     </div>
@@ -55,4 +53,3 @@ export function ProductCard({ product }: { product: CatalogProduct }) {
     </article>
   );
 }
-

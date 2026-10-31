@@ -1,11 +1,7 @@
 import { useEffect, useState } from "react";
 import { Link } from "@tanstack/react-router";
 
-import {
-  getMegaMenu,
-  getMegaMenuSync,
-  type MegaMenuContent,
-} from "@/lib/mega-menu";
+import { getMegaMenu, getMegaMenuSync, type MegaMenuContent } from "@/lib/mega-menu";
 
 /**
  * Mega menu panel. Content is fetched through `getMegaMenu(menuKey)` so the

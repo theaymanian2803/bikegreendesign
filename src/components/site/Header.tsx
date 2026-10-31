@@ -12,7 +12,6 @@ import {
 } from "@/lib/topbar.functions";
 import { MegaMenu } from "@/components/site/MegaMenu";
 
-
 const nav = [
   { label: "Home", to: "/" },
   { label: "Shop", to: "/shop", caret: true, menuKey: "shop" },
@@ -42,31 +41,30 @@ export function Header() {
   }, []);
 
   return (
-
     <header className="w-full">
       <div className="hidden border-b border-border bg-topbar text-topbar-foreground lg:block">
         {topBar.enabled ? (
-        <div className="mx-auto flex max-w-[1200px] items-center justify-between px-4 py-2 text-xs">
-          <div className="flex items-center gap-5">
-            <span className="flex items-center gap-1.5">
-              <MapPin className="size-3.5 text-primary" /> {topBar.location}
-            </span>
-            <span className="flex items-center gap-1.5">
-              <Phone className="size-3.5 text-primary" /> {topBar.phone}
-            </span>
-            <span className="flex items-center gap-1.5">
-              <Mail className="size-3.5 text-primary" /> {topBar.email}
-            </span>
+          <div className="mx-auto flex max-w-[1200px] items-center justify-between px-4 py-2 text-xs">
+            <div className="flex items-center gap-5">
+              <span className="flex items-center gap-1.5">
+                <MapPin className="size-3.5 text-primary" /> {topBar.location}
+              </span>
+              <span className="flex items-center gap-1.5">
+                <Phone className="size-3.5 text-primary" /> {topBar.phone}
+              </span>
+              <span className="flex items-center gap-1.5">
+                <Mail className="size-3.5 text-primary" /> {topBar.email}
+              </span>
+            </div>
+            <div className="flex items-center gap-4">
+              <Link to={topBar.trackOrderHref} className="transition-colors hover:text-primary">
+                Track Order
+              </Link>
+              <span>Help Center</span>
+              <span>English</span>
+              <span>$ USD</span>
+            </div>
           </div>
-          <div className="flex items-center gap-4">
-            <Link to={topBar.trackOrderHref} className="transition-colors hover:text-primary">
-              Track Order
-            </Link>
-            <span>Help Center</span>
-            <span>English</span>
-            <span>$ USD</span>
-          </div>
-        </div>
         ) : null}
       </div>
 
@@ -104,7 +102,6 @@ export function Header() {
             ))}
           </nav>
 
-
           <div className="flex items-center gap-4 text-ink">
             <Search className="size-5" />
             <Link
@@ -126,7 +123,6 @@ export function Header() {
                 {count}
               </span>
             </Link>
-
           </div>
         </div>
 

@@ -3,10 +3,7 @@ import { createFileRoute } from "@tanstack/react-router";
 import { LandingSections } from "@/components/site/landing/landing-sections";
 import { PromoPopup } from "@/components/site/PromoPopup";
 import { HomeStatic } from "@/components/site/HomeStatic";
-import {
-  listCatalogCategories,
-  listCatalogProducts,
-} from "@/integrations/turso/catalog.functions";
+import { listCatalogCategories, listCatalogProducts } from "@/integrations/turso/catalog.functions";
 import { getLandingSections, getPromoPopup } from "@/integrations/turso/landing.functions";
 import { listApprovedReviews } from "@/integrations/turso/reviews.functions";
 import { getSettings } from "@/lib/settings.functions";

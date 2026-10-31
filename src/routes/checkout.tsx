@@ -89,7 +89,7 @@ function CheckoutPage() {
       const placed = await placeOrder({
         data: {
           ...parsed.data,
-          items: items.map((i) => ({ name: i.name, price: i.price, qty: i.qty })),
+          items: items.map((i) => ({ id: i.id, name: i.name, price: i.price, qty: i.qty })),
         },
       });
       setOrder({ id: placed.publicId, email: placed.email, total: placed.total });
@@ -126,8 +126,8 @@ function CheckoutPage() {
             <CheckCircle2 className="mx-auto size-10 text-primary" />
             <h2 className="mt-4 text-xl text-ink">Thank you, your order is placed!</h2>
             <p className="mt-2 text-xs text-muted-foreground">
-              Order <span className="font-bold text-ink">{order.id}</span> — a confirmation was
-              sent to {order.email}. Our workshop crew will pack and ship it within 24 hours.
+              Order <span className="font-bold text-ink">{order.id}</span> — a confirmation was sent
+              to {order.email}. Our workshop crew will pack and ship it within 24 hours.
             </p>
             <p className="mt-4 text-lg font-bold text-primary">${order.total.toFixed(2)}</p>
             <div className="mt-6 flex flex-wrap justify-center gap-3">

@@ -30,40 +30,56 @@ export function HomeStatic({
   const gear = products.slice(0, 4);
   const parts = products.slice(4, 8);
 
-const services = [
-  { title: "Part Replacement", image: servicePart },
-  { title: "Bike Maintenance", image: serviceMaintenance },
-  { title: "Damage Repairing", image: serviceRepair },
-  { title: "E-Bike Test", image: serviceTest },
-];
+  const services = [
+    { title: "Part Replacement", image: servicePart },
+    { title: "Bike Maintenance", image: serviceMaintenance },
+    { title: "Damage Repairing", image: serviceRepair },
+    { title: "E-Bike Test", image: serviceTest },
+  ];
 
-const features = [
-  { icon: Bike, title: "Best Bikes In City", text: "A carefully picked range built for every road and every rider." },
-  { icon: ShoppingBag, title: "Clothing & Gear", text: "Helmets, jerseys and protection from the brands we trust." },
-  { icon: Award, title: "Experience", text: "Over twenty years of wrenching, fitting and building bikes." },
-  { icon: Tag, title: "No Charges", text: "Free tune-up checks on every bike bought in our store." },
-];
+  const features = [
+    {
+      icon: Bike,
+      title: "Best Bikes In City",
+      text: "A carefully picked range built for every road and every rider.",
+    },
+    {
+      icon: ShoppingBag,
+      title: "Clothing & Gear",
+      text: "Helmets, jerseys and protection from the brands we trust.",
+    },
+    {
+      icon: Award,
+      title: "Experience",
+      text: "Over twenty years of wrenching, fitting and building bikes.",
+    },
+    {
+      icon: Tag,
+      title: "No Charges",
+      text: "Free tune-up checks on every bike bought in our store.",
+    },
+  ];
 
-const testimonials = [
-  {
-    name: "Leslie Alexander",
-    role: "Customer",
-    text: "They stripped, cleaned and rebuilt my entire drivetrain in a single day. The bike shifts like it did the week I bought it.",
-  },
-  {
-    name: "Cristofer Bailey",
-    role: "Customer",
-    text: "Honest advice, fair prices and nobody upsells you. I have sent half of my riding club here already.",
-  },
-];
+  const testimonials = [
+    {
+      name: "Leslie Alexander",
+      role: "Customer",
+      text: "They stripped, cleaned and rebuilt my entire drivetrain in a single day. The bike shifts like it did the week I bought it.",
+    },
+    {
+      name: "Cristofer Bailey",
+      role: "Customer",
+      text: "Honest advice, fair prices and nobody upsells you. I have sent half of my riding club here already.",
+    },
+  ];
 
-const brands = ["Cycling", "One Biker's", "Biking", "Bicycle", "Go Cycling"];
+  const brands = ["Cycling", "One Biker's", "Biking", "Bicycle", "Go Cycling"];
 
-const gallery = [
-  { title: "How To Write A Blog Post Your Readers Will Love In 5 Steps", image: serviceRepair },
-  { title: "9 Content Marketing Trends And Ideas Worth Trying", image: serviceMaintenance },
-  { title: "The Ultimate Guide To Marketing Strategies For Your Store", image: servicePart },
-];
+  const gallery = [
+    { title: "How To Write A Blog Post Your Readers Will Love In 5 Steps", image: serviceRepair },
+    { title: "9 Content Marketing Trends And Ideas Worth Trying", image: serviceMaintenance },
+    { title: "The Ultimate Guide To Marketing Strategies For Your Store", image: servicePart },
+  ];
 
   const quotes = reviews.length
     ? reviews.slice(0, 2).map((r) => ({
